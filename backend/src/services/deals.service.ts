@@ -47,3 +47,12 @@ const deals: Deal[] = [
 export function getDeals(): Deal[] {
   return deals;
 }
+
+export function addDeal(dealData: Omit<Deal, 'id'>): Deal {
+  const newDeal: Deal = {
+    ...dealData,
+    id: deals.length > 0 ? Math.max(...deals.map(d => d.id)) + 1 : 1,
+  };
+  deals.push(newDeal);
+  return newDeal;
+}
