@@ -218,24 +218,34 @@ export const DealsSection = () => {
     
 
       {/* Featured Destination */}
-      <section className="relative w-full h-[600px] flex items-center justify-center mb-24">
-        <img alt="Amalfi Coast" className="absolute inset-0 w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBCCGpkA_InLa3R5wsfU_LX15rwJKZ37axve-Xamd-zJiOIzV5pOcpXPXhAsoCu6KlsM2PHZtGMNGB3Gz8eYqsbvU-dnQ3FykmA6MXItCQsyFnln5wXreJ9CUSjq5stpMuBLziDiAp63f1iYpkOGEsmCBSDjhGYEh1wfV_8yQxj4-TMELwJCIobK5cPliRSODTGJdwCysLcFf8yjgIlPiBEQLRIRKTNBQkBca_bM-9rGBxfpQPGrJD9AXoIQmvikEdFBao8i35Udm_"/>
-        <div className="absolute inset-0 bg-primary/60 mix-blend-multiply"></div>
+      <section className="relative w-full h-[600px] flex items-center justify-center mb-24 overflow-hidden group">
+        <motion.img 
+          initial={{ scale: 1 }}
+          whileInView={{ scale: 1.05 }}
+          transition={{ duration: 10, ease: "linear" }}
+          viewport={{ once: false }}
+          alt="Amalfi Coast" 
+          className="absolute inset-0 w-full h-full object-cover" 
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBCCGpkA_InLa3R5wsfU_LX15rwJKZ37axve-Xamd-zJiOIzV5pOcpXPXhAsoCu6KlsM2PHZtGMNGB3Gz8eYqsbvU-dnQ3FykmA6MXItCQsyFnln5wXreJ9CUSjq5stpMuBLziDiAp63f1iYpkOGEsmCBSDjhGYEh1wfV_8yQxj4-TMELwJCIobK5cPliRSODTGJdwCysLcFf8yjgIlPiBEQLRIRKTNBQkBca_bM-9rGBxfpQPGrJD9AXoIQmvikEdFBao8i35Udm_"
+        />
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-all duration-700 group-hover:bg-black/70"></div>
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
           className="relative z-10 text-center px-6 max-w-3xl mx-auto"
         >
-          <span className="font-label-caps text-secondary-fixed tracking-widest mb-4 block">Featured Destination</span>
-          <h2 className="font-h1 text-white text-5xl md:text-6xl mb-6">The Amalfi Coast</h2>
-          <p className="font-body-lg text-white/90 mb-8 text-lg md:text-xl">Discover cliffside luxury and Mediterranean charm with our curated collection of Italian coastal retreats. Up to 40% off premium suites.</p>
+          <span className="font-label-caps text-yellow-400 tracking-widest mb-4 block drop-shadow-lg opacity-90">Featured Destination</span>
+          <h2 className="font-h1 text-white text-5xl md:text-6xl mb-6 drop-shadow-2xl font-bold">The Amalfi Coast</h2>
+          <p className="font-body-lg text-white mb-8 text-lg md:text-xl drop-shadow-lg opacity-95">Discover cliffside luxury and Mediterranean charm with our curated collection of Italian coastal retreats. Up to 40% off premium suites.</p>
           <motion.button 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="font-body-md px-8 py-4 bg-secondary-fixed text-on-secondary-fixed rounded hover:bg-secondary-container transition-colors shadow-lg font-medium text-lg"
+            className="font-body-md px-8 py-4 bg-white text-primary rounded-full hover:bg-gray-100 transition-colors shadow-2xl font-medium text-lg flex items-center justify-center gap-2 mx-auto group/btn"
           >
             Explore Amalfi Deals
+            <span className="material-symbols-outlined text-[20px] transition-transform duration-300 group-hover/btn:translate-x-1">arrow_forward</span>
           </motion.button>
         </motion.div>
       </section>
