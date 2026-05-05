@@ -1,19 +1,21 @@
-import { useEffect, useState } from 'react';
+import { Navbar } from './components/layout/Navbar';
+import { Footer } from './components/layout/Footer';
+import { Hero } from './components/home/Hero';
+import { SearchBar } from './components/home/SearchBar';
+import { TrendingGrid } from './components/home/TrendingGrid';
+import { TrustSection } from './components/home/TrustSection';
 
 function App() {
-  const [status, setStatus] = useState<string>('Loading');
-
-  useEffect(() => {
-    fetch('http://localhost:5000/api/health')
-      .then((res) => res.json())
-      .then((data) => setStatus(data.status))
-      .catch(() => setStatus('Error connecting to backend'));
-  }, []);
-
   return (
-    <div>
-      <h1>Hotel App</h1>
-      <p>Backend Status: {status}</p>
+    <div className="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col">
+      <Navbar />
+      <main className="flex-grow">
+        <Hero />
+        <SearchBar />
+        <TrendingGrid />
+        <TrustSection />
+      </main>
+      <Footer />
     </div>
   );
 }
