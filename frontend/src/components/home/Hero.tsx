@@ -1,10 +1,11 @@
 import { motion } from 'framer-motion';
+import heroImage from '../../images/hero.jpg';
 
 export const Hero = () => {
   return (
     <section className="relative w-full h-[716px] min-h-[600px] flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 z-0">
-        <img alt="Luxury resort infinity pool overlooking a serene mountain range at sunrise" className="w-full h-full object-cover object-center" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4nlD8aFKE21vZJiLI2ycGUpUXqzRKz8pYP7BLfZyarSoudrL57NJIb7LK_twAEdoFp6mUx63p5x-cAdDs1useBLZLSDMxApcmU_0MbfawsO3--d9GDJvY2yYfmtGalkHe2G6EKdFoyQXaGHDmRpm_jjs1JOIjfCVKKlg6GLf7wia65qb-1G3F29BIYIGBYpxVO3GTBeGabSOWir9h4C7qqPUUaCv25f_trnIYKhMI_ziUcirccSufogz_HNnzVNJjHLQgltcBA7R-=w2560" fetchPriority="high" />
+        <img alt="Luxury resort infinity pool overlooking a serene mountain range at sunrise" className="w-full h-full object-cover object-center" src={heroImage} fetchPriority="high" />
         <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/30 to-transparent"></div>
       </div>
       <motion.div 
