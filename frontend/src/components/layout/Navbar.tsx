@@ -44,27 +44,6 @@ export const Navbar = () => {
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-2" onMouseLeave={() => setHoveredTab(null)}>
           {NAV_LINKS.map((link) => (
-            link.path === '/deals' ? (
-            <a
-              key={link.path}
-              href="http://localhost:5000/deals"
-              onMouseEnter={() => setHoveredTab(link.path)}
-              className={`relative flex items-center justify-center px-4 py-2 min-h-[44px] font-body-md text-body-md transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-full ${isSolid ? (hoveredTab === link.path || location.pathname === link.path ? 'text-primary' : 'text-on-surface-variant') : (hoveredTab === link.path || location.pathname === link.path ? 'text-on-primary' : 'text-on-primary/80')}`}
-              aria-current={location.pathname === link.path ? 'page' : undefined}
-            >
-              <span className="relative z-10">{link.name}</span>
-              {(hoveredTab === link.path || (hoveredTab === null && location.pathname === link.path)) && (
-                <motion.div
-                  layoutId="navbar-hover"
-                  className={`absolute inset-0 rounded-full ${isSolid ? 'bg-primary/10' : 'bg-white/20'}`}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                />
-              )}
-            </a>
-          ) : (
             <Link
               key={link.path}
               to={link.path}
@@ -88,7 +67,6 @@ export const Navbar = () => {
                 />
               )}
             </Link>
-          )
           ))}
         </nav>
 
@@ -102,27 +80,6 @@ export const Navbar = () => {
       {/* Mobile Nav (Bottom) */}
       <nav className="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 md:hidden bg-surface/90 backdrop-blur-lg border-t border-surface-variant/10 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-50 pb-[env(safe-area-inset-bottom)]">
         {NAV_LINKS.map((link) => (
-          link.path === '/deals' ? (
-          <a
-            key={link.path}
-            href="http://localhost:5000/deals"
-            className={`relative flex flex-col items-center justify-center min-w-[72px] min-h-[44px] rounded-xl px-4 py-2 transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${activeMobileTab === link.path ? 'text-primary font-bold' : 'text-outline hover:text-primary'}`}
-            aria-current={activeMobileTab === link.path ? 'page' : undefined}
-          >
-            <motion.div whileTap={{ scale: 0.85 }} className="flex flex-col items-center z-10">
-              <link.icon className="w-6 h-6 mb-1" aria-hidden="true" />
-              <span className="font-label-caps text-[10px] uppercase tracking-widest">{link.name}</span>
-            </motion.div>
-
-            {activeMobileTab === link.path && (
-              <motion.div
-                layoutId="mobile-active"
-                className="absolute inset-0 bg-primary/10 rounded-xl"
-                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-              />
-            )}
-          </a>
-        ) : (
           <Link
             key={link.path}
             to={link.path}
@@ -145,7 +102,6 @@ export const Navbar = () => {
               />
             )}
           </Link>
-        )
         ))}
       </nav>
     </header>

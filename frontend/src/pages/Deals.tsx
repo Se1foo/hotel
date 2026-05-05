@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { ArrowRight, MapPin, Quote, Star, CheckCircle } from 'lucide-react';
 
 export default function Deals() {
   return (
@@ -57,7 +58,7 @@ export default function Deals() {
               <div className="flex justify-between items-end">
                 <div>
                   <p className="font-body-md flex items-center gap-1 mb-2 text-white/80">
-                    <span className="material-symbols-outlined text-[16px]">location_on</span>
+                    <MapPin className="w-4 h-4" />
                     Ubud, Bali
                   </p>
                   <h3 className="font-h2 text-3xl font-medium mb-2">Viceroy Bali Luxury Resort</h3>
@@ -87,7 +88,7 @@ export default function Deals() {
             <div className="p-6 flex flex-col flex-grow">
               <h3 className="font-h3 text-xl text-primary mb-1">Aura Suites</h3>
               <p className="font-body-md text-sm text-on-surface-variant flex items-center gap-1 mb-4">
-                <span className="material-symbols-outlined text-[16px]">location_on</span>
+                <MapPin className="w-4 h-4" />
                 Santorini, Greece
               </p>
               <div className="mt-auto pt-4 flex justify-between items-end border-t border-outline-variant/20">
@@ -97,7 +98,7 @@ export default function Deals() {
                 </div>
                 <button className="font-body-md text-sm text-primary font-medium group-hover:text-secondary flex items-center gap-1 transition-colors">
                   View Deal
-                  <span className="material-symbols-outlined text-[16px] transition-transform duration-300 group-hover:translate-x-1">arrow_forward</span>
+                  <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </button>
               </div>
             </div>
@@ -120,7 +121,7 @@ export default function Deals() {
             <div className="p-6 flex flex-col flex-grow">
               <h3 className="font-h3 text-xl text-primary mb-1">Coco Bodu Hithi</h3>
               <p className="font-body-md text-sm text-on-surface-variant flex items-center gap-1 mb-4">
-                <span className="material-symbols-outlined text-[16px]">location_on</span>
+                <MapPin className="w-4 h-4" />
                 Maldives
               </p>
               <div className="mt-auto pt-4 flex justify-between items-end border-t border-outline-variant/20">
@@ -130,7 +131,7 @@ export default function Deals() {
                 </div>
                 <button className="font-body-md text-sm text-primary font-medium group-hover:text-secondary flex items-center gap-1 transition-colors">
                   View Deal
-                  <span className="material-symbols-outlined text-[16px] transition-transform duration-300 group-hover:translate-x-1">arrow_forward</span>
+                  <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </button>
               </div>
             </div>
@@ -153,7 +154,7 @@ export default function Deals() {
             <div className="p-8 w-full md:w-1/2 flex flex-col justify-center">
               <h3 className="font-h3 text-2xl text-primary mb-2">The Chedi Andermatt</h3>
               <p className="font-body-md text-on-surface-variant flex items-center gap-1 mb-4">
-                <span className="material-symbols-outlined text-[16px]">location_on</span>
+                <MapPin className="w-4 h-4" />
                 Swiss Alps, Switzerland
               </p>
               <p className="font-body-md text-on-surface-variant mb-6 line-clamp-3">Experience unparalleled alpine luxury with exclusive access to premium ski slopes and world-class spa facilities. Includes daily breakfast and one massage.</p>
@@ -164,7 +165,7 @@ export default function Deals() {
                 </div>
                 <button className="font-body-md px-6 py-2 bg-primary text-on-primary rounded hover:bg-primary/90 transition-colors flex items-center gap-2">
                   Book Now
-                  <span className="material-symbols-outlined text-[18px] transition-transform duration-300 group-hover:translate-x-1">arrow_forward</span>
+                  <ArrowRight className="w-4.5 h-4.5 transition-transform duration-300 group-hover:translate-x-1" />
                 </button>
               </div>
             </div>
@@ -200,7 +201,7 @@ export default function Deals() {
             className="font-body-md px-8 py-4 bg-white text-primary rounded-full hover:bg-gray-100 transition-colors shadow-2xl font-medium text-lg flex items-center justify-center gap-2 mx-auto group/btn"
           >
             Explore Amalfi Deals
-            <span className="material-symbols-outlined text-[20px] transition-transform duration-300 group-hover/btn:translate-x-1">arrow_forward</span>
+            <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover/btn:translate-x-1" />
           </motion.button>
         </motion.div>
       </section>
@@ -219,13 +220,13 @@ export default function Deals() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="bg-surface rounded-xl p-8 border border-outline-variant/20 shadow-sm relative pt-12 hover:-translate-y-2 hover:shadow-ambient-elevated transition-all duration-300"
           >
-            <span className="material-symbols-outlined absolute top-6 left-8 text-secondary/30 text-4xl">format_quote</span>
+            <Quote className="absolute top-6 left-8 text-secondary/30 w-9 h-9" />
             <div className="flex gap-1 mb-4 text-secondary">
-              <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-              <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-              <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-              <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-              <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+              <Star className="w-4.5 h-4.5 fill-current" />
+              <Star className="w-4.5 h-4.5 fill-current" />
+              <Star className="w-4.5 h-4.5 fill-current" />
+              <Star className="w-4.5 h-4.5 fill-current" />
+              <Star className="w-4.5 h-4.5 fill-current" />
             </div>
             <p className="font-body-md text-on-surface mb-6 italic">"The attention to detail at Aura Suites was impeccable. Booking through StayEase gave us a seamless VIP experience from start to finish."</p>
             <div className="flex items-center gap-4">
@@ -244,13 +245,13 @@ export default function Deals() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="bg-surface rounded-xl p-8 border border-outline-variant/20 shadow-sm relative pt-12 hover:-translate-y-2 hover:shadow-ambient-elevated transition-all duration-300"
           >
-            <span className="material-symbols-outlined absolute top-6 left-8 text-secondary/30 text-4xl">format_quote</span>
+            <Quote className="absolute top-6 left-8 text-secondary/30 w-9 h-9" />
             <div className="flex gap-1 mb-4 text-secondary">
-              <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-              <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-              <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-              <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-              <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+              <Star className="w-4.5 h-4.5 fill-current" />
+              <Star className="w-4.5 h-4.5 fill-current" />
+              <Star className="w-4.5 h-4.5 fill-current" />
+              <Star className="w-4.5 h-4.5 fill-current" />
+              <Star className="w-4.5 h-4.5 fill-current" />
             </div>
             <p className="font-body-md text-on-surface mb-6 italic">"Finding such an exclusive deal for The Chedi was a dream. The booking process was effortless and the price genuinely couldn't be beaten."</p>
             <div className="flex items-center gap-4">
@@ -269,13 +270,13 @@ export default function Deals() {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="bg-surface rounded-xl p-8 border border-outline-variant/20 shadow-sm relative pt-12 hover:-translate-y-2 hover:shadow-ambient-elevated transition-all duration-300"
           >
-            <span className="material-symbols-outlined absolute top-6 left-8 text-secondary/30 text-4xl">format_quote</span>
+            <Quote className="absolute top-6 left-8 text-secondary/30 w-9 h-9" />
             <div className="flex gap-1 mb-4 text-secondary">
-              <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-              <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-              <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-              <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-              <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+              <Star className="w-4.5 h-4.5 fill-current" />
+              <Star className="w-4.5 h-4.5 fill-current" />
+              <Star className="w-4.5 h-4.5 fill-current" />
+              <Star className="w-4.5 h-4.5 fill-current" />
+              <Star className="w-4.5 h-4.5 fill-current" />
             </div>
             <p className="font-body-md text-on-surface mb-6 italic">"The flash deal alert saved us over $2000 on our Maldives honeymoon. StayEase is now my go-to for luxury travel."</p>
             <div className="flex items-center gap-4">
@@ -301,14 +302,14 @@ export default function Deals() {
           {/* Abstract background pattern */}
           <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
           <div className="relative z-10">
-            <span className="material-symbols-outlined text-5xl text-secondary-fixed mb-6 block mx-auto" aria-hidden="true">verified</span>
+            <CheckCircle className="w-12 h-12 text-secondary-fixed mb-6 block mx-auto" aria-hidden="true" />
             <h2 className="font-h2 text-h2 text-white mb-4">Best Price Guarantee</h2>
             <p className="font-body-lg text-white/80 max-w-2xl mx-auto mb-8">
               If you find a lower price on another website, we'll match it and give you an additional 10% off. Book directly with absolute confidence.
             </p>
             <button className="font-label-caps tracking-widest text-secondary-fixed uppercase hover:text-white transition-colors border-b border-secondary-fixed pb-1 hover:border-white flex items-center justify-center gap-2 mx-auto group">
               Learn More
-              <span className="material-symbols-outlined text-[18px] transition-transform duration-300 group-hover:translate-x-1">arrow_forward</span>
+              <ArrowRight className="w-4.5 h-4.5 transition-transform duration-300 group-hover:translate-x-1" />
             </button>
           </div>
         </motion.div>
