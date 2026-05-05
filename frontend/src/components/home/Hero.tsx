@@ -20,17 +20,19 @@ export const Hero = () => {
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
           className="font-h1 text-4xl md:text-h1 text-on-primary mb-4 md:mb-6 drop-shadow-lg leading-tight"
         >
-          Find Your Next Sanctuary
+          Travel Better, Stress Less.
         </motion.h1>
         <motion.p 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
-          className="font-body-lg text-base md:text-body-lg text-on-primary/90 max-w-2xl mx-auto drop-shadow-md"
+          className="font-body-lg text-base md:text-body-lg text-white font-semibold max-w-2xl mx-auto drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] tracking-wide"
         >
-          Book unique stays at the best prices, curated for the sophisticated traveler seeking peace and precision.
+          We find the world's most unique escapes at the best rates, so you don't have to.
         </motion.p>
       </motion.div>
     </section>
   );
 };
+
+

@@ -30,6 +30,12 @@
   --color-on-secondary: #ffffff;
   --color-secondary-container: #fed488;
   --color-on-secondary-container: #785a1a;
+  --color-secondary-fixed: #ffdea5;
+  --color-on-secondary-fixed: #261900;
+  --color-tertiary: #151614;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #2a2a28;
+  --color-on-tertiary-container: #92918d;
 
   --font-h1: "Noto Serif", serif;
   --font-h2: "Noto Serif", serif;
@@ -50,6 +56,15 @@
   --spacing-gutter: 24px;
   --spacing-section-padding: 80px;
   --spacing-card-gap: 32px;
+}
+
+@layer utilities {
+  .shadow-ambient-elevated {
+    box-shadow: 0 4px 16px rgba(4, 22, 39, 0.05);
+  }
+  .shadow-ambient-floating {
+    box-shadow: 0 12px 32px rgba(4, 22, 39, 0.08);
+  }
 }
 
 @layer base {

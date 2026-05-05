@@ -40,7 +40,7 @@ Thumbs.db
 *.sln
 *.sw?
 
-# Copilot Agents
+
 .agents/
 
 
@@ -56,6 +56,8 @@ frontend/*.local
 .env.development.local
 .env.test.local
 .env.production.local
+plan.txt
+update.txt
 
 
 # AI Agent & CLI Folders
