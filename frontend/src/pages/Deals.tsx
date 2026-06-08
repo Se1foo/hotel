@@ -1,7 +1,48 @@
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, MapPin, Quote, Star, CheckCircle } from 'lucide-react';
 
+interface Deal {
+  id: number;
+  title: string;
+  location: string;
+  originalPrice: number;
+  price: number;
+  image: string;
+  tag: string;
+  type: 'featured' | 'small' | 'medium';
+  description?: string;
+}
+
 export default function Deals() {
+  const [deals, setDeals] = useState<Deal[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/deals')
+      .then((res) => res.json())
+      .then((data) => {
+        setDeals(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('Error fetching deals:', err);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <main className="flex-grow w-full flex items-center justify-center min-h-[400px]">
+        <p className="font-body-lg text-on-surface-variant">Loading exclusive escapes...</p>
+      </main>
+    );
+  }
+
+  const featuredDeal = deals.find((d) => d.type === 'featured');
+  const smallDeals = deals.filter((d) => d.type === 'small');
+  const mediumDeal = deals.find((d) => d.type === 'medium');
+
   return (
     <main className="flex-grow w-full">
       {/* Hero Section */}
@@ -40,136 +81,112 @@ export default function Deals() {
       <section className="max-w-[1200px] mx-auto px-6 md:px-12 pb-24">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 auto-rows-[400px]">
           {/* Featured Large Card */}
-          <motion.article 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.5 }}
-            className="md:col-span-8 bg-surface-container-lowest rounded-xl shadow-ambient-elevated hover:shadow-ambient-floating border border-outline-variant/30 overflow-hidden group relative flex flex-col justify-end p-8 cursor-pointer transition-shadow"
-          >
-            <img alt="Luxury villa in Bali" className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBaLP227AGZW2E3Pp7jwBBCUbBcbliZyqs3LwwaqkBA1kf4aS2O5zg7-3TMrFEp6NZXYjh9mmDX7KDjKfc62rc-hPGUxwxnNHkFtAf9s1OMf_utZdsio_y9wpPBvM1diZZaZ6yfO3W09YQaRCt-3Nk5SCH4xk2SUxpy3UrysJt23eK6xYuwCfHz7UdoBixG7XEUaDJPMWBErMF78Ixb1X1XBy9pCydS6AcYfwd4T3ZoDyNvlzC_XASMHkp6gpAjpckWiAlAGjwjTXLs"/>
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-            
-            <div className="absolute top-6 left-6 bg-secondary-fixed text-on-secondary-fixed font-label-caps text-label-caps px-3 py-1.5 rounded-full shadow-md z-10">
-              Top Pick
-            </div>
-            
-            <div className="relative z-10 text-white">
-              <div className="flex justify-between items-end">
-                <div>
-                  <p className="font-body-md flex items-center gap-1 mb-2 text-white/80">
-                    <MapPin className="w-4 h-4" />
-                    Ubud, Bali
-                  </p>
-                  <h3 className="font-h2 text-3xl font-medium mb-2">Viceroy Bali Luxury Resort</h3>
-                </div>
-                <div className="text-right">
-                  <p className="font-body-md text-white/70 line-through text-sm mb-1">$1,800/night</p>
-                  <p className="font-h3 text-2xl font-semibold">$1,250<span className="text-lg font-normal text-white/80">/night</span></p>
+          {featuredDeal && (
+            <motion.article 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5 }}
+              className="md:col-span-8 bg-surface-container-lowest rounded-xl shadow-ambient-elevated hover:shadow-ambient-floating border border-outline-variant/30 overflow-hidden group relative flex flex-col justify-end p-8 cursor-pointer transition-shadow"
+            >
+              <img alt={featuredDeal.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" src={featuredDeal.image}/>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+              
+              <div className="absolute top-6 left-6 bg-secondary-fixed text-on-secondary-fixed font-label-caps text-label-caps px-3 py-1.5 rounded-full shadow-md z-10">
+                {featuredDeal.tag}
+              </div>
+              
+              <div className="relative z-10 text-white">
+                <div className="flex justify-between items-end">
+                  <div>
+                    <p className="font-body-md flex items-center gap-1 mb-2 text-white/80">
+                      <MapPin className="w-4 h-4" />
+                      {featuredDeal.location}
+                    </p>
+                    <h3 className="font-h2 text-3xl font-medium mb-2">{featuredDeal.title}</h3>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-body-md text-white/70 line-through text-sm mb-1">${featuredDeal.originalPrice.toLocaleString()}/night</p>
+                    <p className="font-h3 text-2xl font-semibold">${featuredDeal.price.toLocaleString()}<span className="text-lg font-normal text-white/80">/night</span></p>
+                  </div>
                 </div>
               </div>
-            </div>
-          </motion.article>
+            </motion.article>
+          )}
 
-          {/* Small Card 1 */}
-          <motion.article 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="md:col-span-4 bg-surface-container-lowest rounded-xl shadow-ambient-elevated hover:shadow-ambient-floating border border-outline-variant/30 overflow-hidden group flex flex-col cursor-pointer transition-shadow"
-          >
-            <div className="relative h-48 overflow-hidden">
-              <img alt="Santorini view" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWkmvep8j9PtpsJ38xYfcvQ3ZVGWc9SgKQTVJRP8Su47falc6Hcu-ccqFB7LKxnCLIip6HE1qv73w5v2jQzNXxXGvtN-RA6iM_9YGa9z_3TCB7PWm6obiQqCtyDnqHcx-N6L6Q7nz5qtAOX_Wb1ykyUyihortQkI76VZA6ifm6Sf6hAzUYclWaDZG0D9op6xTLirT5DErSF2sWWDbtvGY2qvub5J3KIrgKd_k9yxjW4lEPPsmbZziS5lw341csXVxS0i5yxLjlsIcU"/>
-              <div className="absolute top-4 left-4 bg-secondary-fixed text-on-secondary-fixed font-label-caps text-label-caps px-3 py-1.5 rounded-full shadow-md">
-                Save 35%
-              </div>
-            </div>
-            <div className="p-6 flex flex-col flex-grow">
-              <h3 className="font-h3 text-xl text-primary mb-1">Aura Suites</h3>
-              <p className="font-body-md text-sm text-on-surface-variant flex items-center gap-1 mb-4">
-                <MapPin className="w-4 h-4" />
-                Santorini, Greece
-              </p>
-              <div className="mt-auto pt-4 flex justify-between items-end border-t border-outline-variant/20">
-                <div className="flex flex-col">
-                  <span className="font-body-md text-xs text-on-surface-variant line-through decoration-outline">$1,200</span>
-                  <span className="font-h3 text-xl text-primary">$780<span className="font-body-md text-sm text-on-surface-variant">/n</span></span>
+          {/* Small Cards */}
+          {smallDeals.map((deal, idx) => (
+            <motion.article 
+              key={deal.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: 0.1 * (idx + 1) }}
+              className="md:col-span-4 bg-surface-container-lowest rounded-xl shadow-ambient-elevated hover:shadow-ambient-floating border border-outline-variant/30 overflow-hidden group flex flex-col cursor-pointer transition-shadow"
+            >
+              <div className="relative h-48 overflow-hidden">
+                <img alt={deal.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src={deal.image}/>
+                <div className="absolute top-4 left-4 bg-secondary-fixed text-on-secondary-fixed font-label-caps text-label-caps px-3 py-1.5 rounded-full shadow-md">
+                  {deal.tag}
                 </div>
-                <button className="font-body-md text-sm text-primary font-medium group-hover:text-secondary flex items-center gap-1 transition-colors">
-                  View Deal
-                  <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-                </button>
               </div>
-            </div>
-          </motion.article>
-
-          {/* Small Card 2 */}
-          <motion.article 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="md:col-span-4 bg-surface-container-lowest rounded-xl shadow-ambient-elevated hover:shadow-ambient-floating border border-outline-variant/30 overflow-hidden group flex flex-col cursor-pointer transition-shadow"
-          >
-            <div className="relative h-48 overflow-hidden">
-              <img alt="Maldives water villa" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWoaw2MxH4yyUrW4TMotsxLeDBxp21VJPXthmlubbwD-LJ3iKF8eG7nrae90uWD9vKMnWT3HnpHUCO4HRjxzbWlMHZGiOp2C1KTh7AvrmNK_2Z3M_KrkV4JCx6MTuAzyrnXsyosXdl5zS-TQyVix7LSuQ73EGA_hK0J1fR3b6Cpq7rlLgoTpWSKiZH28V7Qomt34hP5KFD4tIHhycuzjr9m_Ihp_vJqNMEt2vTHNMqFjfUn1kIpesPg6lolZxwX806YTebn5U47pTO"/>
-              <div className="absolute top-4 left-4 bg-surface-container-lowest/90 backdrop-blur-sm text-primary font-label-caps text-label-caps px-3 py-1.5 rounded-full shadow-md">
-                Flash Deal
-              </div>
-            </div>
-            <div className="p-6 flex flex-col flex-grow">
-              <h3 className="font-h3 text-xl text-primary mb-1">Coco Bodu Hithi</h3>
-              <p className="font-body-md text-sm text-on-surface-variant flex items-center gap-1 mb-4">
-                <MapPin className="w-4 h-4" />
-                Maldives
-              </p>
-              <div className="mt-auto pt-4 flex justify-between items-end border-t border-outline-variant/20">
-                <div className="flex flex-col">
-                  <span className="font-body-md text-xs text-on-surface-variant line-through decoration-outline">$2,100</span>
-                  <span className="font-h3 text-xl text-primary">$1,450<span className="font-body-md text-sm text-on-surface-variant">/n</span></span>
+              <div className="p-6 flex flex-col flex-grow">
+                <h3 className="font-h3 text-xl text-primary mb-1">{deal.title}</h3>
+                <p className="font-body-md text-sm text-on-surface-variant flex items-center gap-1 mb-4">
+                  <MapPin className="w-4 h-4" />
+                  {deal.location}
+                </p>
+                <div className="mt-auto pt-4 flex justify-between items-end border-t border-outline-variant/20">
+                  <div className="flex flex-col">
+                    <span className="font-body-md text-xs text-on-surface-variant line-through decoration-outline">${deal.originalPrice.toLocaleString()}</span>
+                    <span className="font-h3 text-xl text-primary">${deal.price.toLocaleString()}<span className="font-body-md text-sm text-on-surface-variant">/n</span></span>
+                  </div>
+                  <button className="font-body-md text-sm text-primary font-medium group-hover:text-secondary flex items-center gap-1 transition-colors">
+                    View Deal
+                    <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+                  </button>
                 </div>
-                <button className="font-body-md text-sm text-primary font-medium group-hover:text-secondary flex items-center gap-1 transition-colors">
-                  View Deal
-                  <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-                </button>
               </div>
-            </div>
-          </motion.article>
+            </motion.article>
+          ))}
 
           {/* Medium Card */}
-          <motion.article 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="md:col-span-8 bg-surface-container-lowest rounded-xl shadow-ambient-elevated hover:shadow-ambient-floating border border-outline-variant/30 overflow-hidden group flex flex-col md:flex-row cursor-pointer transition-shadow"
-          >
-            <div className="relative w-full md:w-1/2 h-48 md:h-full overflow-hidden">
-              <img alt="Swiss Alps Chalet" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPTO_482M6QwYIY9u_ji_KpjqMY2xYGwU5m---wEbUFK7E-GYOzk-pcIyuPFj2XJUaUGlvvUc3oqqixgckHzZVtL9aOD6PNH1G6H2f36XCmoW9VEibnI-ZlDo0P2z3synlyp-EEvOdHROMxiMZnMeVm344ZHa-E0FUFyvoqo5mZfjcOi9974wjskpVNAb64-BVZAJ5fiQEvLcLddRKiGOFH87CaxRunT3LYyU67qE7XQlgtDUxcDLFeGjCUphiP_2jLdeInK-CIr2G"/>
-              <div className="absolute top-4 left-4 bg-primary text-white font-label-caps text-label-caps px-3 py-1.5 rounded-full shadow-md">
-                Winter Escape
-              </div>
-            </div>
-            <div className="p-8 w-full md:w-1/2 flex flex-col justify-center">
-              <h3 className="font-h3 text-2xl text-primary mb-2">The Chedi Andermatt</h3>
-              <p className="font-body-md text-on-surface-variant flex items-center gap-1 mb-4">
-                <MapPin className="w-4 h-4" />
-                Swiss Alps, Switzerland
-              </p>
-              <p className="font-body-md text-on-surface-variant mb-6 line-clamp-3">Experience unparalleled alpine luxury with exclusive access to premium ski slopes and world-class spa facilities. Includes daily breakfast and one massage.</p>
-              <div className="mt-auto pt-6 flex justify-between items-end border-t border-outline-variant/20">
-                <div className="flex flex-col">
-                  <span className="font-body-md text-sm text-on-surface-variant line-through decoration-outline">$1,600</span>
-                  <span className="font-h3 text-2xl text-primary">$1,100<span className="font-body-md text-sm text-on-surface-variant">/night</span></span>
+          {mediumDeal && (
+            <motion.article 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="md:col-span-8 bg-surface-container-lowest rounded-xl shadow-ambient-elevated hover:shadow-ambient-floating border border-outline-variant/30 overflow-hidden group flex flex-col md:flex-row cursor-pointer transition-shadow"
+            >
+              <div className="relative w-full md:w-1/2 h-48 md:h-full overflow-hidden">
+                <img alt={mediumDeal.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src={mediumDeal.image}/>
+                <div className="absolute top-4 left-4 bg-primary text-white font-label-caps text-label-caps px-3 py-1.5 rounded-full shadow-md">
+                  {mediumDeal.tag}
                 </div>
-                <button className="font-body-md px-6 py-2 bg-primary text-on-primary rounded hover:bg-primary/90 transition-colors flex items-center gap-2">
-                  Book Now
-                  <ArrowRight className="w-4.5 h-4.5 transition-transform duration-300 group-hover:translate-x-1" />
-                </button>
               </div>
-            </div>
-          </motion.article>
+              <div className="p-8 w-full md:w-1/2 flex flex-col justify-center">
+                <h3 className="font-h3 text-2xl text-primary mb-2">{mediumDeal.title}</h3>
+                <p className="font-body-md text-on-surface-variant flex items-center gap-1 mb-4">
+                  <MapPin className="w-4 h-4" />
+                  {mediumDeal.location}
+                </p>
+                <p className="font-body-md text-on-surface-variant mb-6 line-clamp-3">
+                  {mediumDeal.description}
+                </p>
+                <div className="mt-auto pt-6 flex justify-between items-end border-t border-outline-variant/20">
+                  <div className="flex flex-col">
+                    <span className="font-body-md text-sm text-on-surface-variant line-through decoration-outline">${mediumDeal.originalPrice.toLocaleString()}</span>
+                    <span className="font-h3 text-2xl text-primary">${mediumDeal.price.toLocaleString()}<span className="font-body-md text-sm text-on-surface-variant">/night</span></span>
+                  </div>
+                  <button className="font-body-md px-6 py-2 bg-primary text-on-primary rounded hover:bg-primary/90 transition-colors flex items-center gap-2">
+                    Book Now
+                    <ArrowRight className="w-4.5 h-4.5 transition-transform duration-300 group-hover:translate-x-1" />
+                  </button>
+                </div>
+              </div>
+            </motion.article>
+          )}
         </div>
       </section>
 
