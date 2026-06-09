@@ -1,6 +1,11 @@
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { getDestinations } from '../services/explore.service';
 
-export function listDestinations(_req: Request, res: Response): void {
-  res.status(200).json(getDestinations());
+export async function listDestinations(_req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const destinations = await getDestinations();
+    res.status(200).json(destinations);
+  } catch (error) {
+    next(error);
+  }
 }

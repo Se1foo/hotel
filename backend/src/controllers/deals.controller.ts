@@ -1,11 +1,20 @@
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { getDeals, addDeal } from '../services/deals.service';
 
-export function listDeals(_req: Request, res: Response): void {
-  res.status(200).json(getDeals());
+export async function listDeals(_req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const deals = await getDeals();
+    res.status(200).json(deals);
+  } catch (error) {
+    next(error);
+  }
 }
 
-export function createDeal(req: Request, res: Response): void {
-  const newDeal = addDeal(req.body);
-  res.status(201).json(newDeal);
+export async function createDeal(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const newDeal = await addDeal(req.body);
+    res.status(201).json(newDeal);
+  } catch (error) {
+    next(error);
+  }
 }

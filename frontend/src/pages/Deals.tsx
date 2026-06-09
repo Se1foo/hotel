@@ -1,40 +1,33 @@
-import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, MapPin, Quote, Star, CheckCircle } from 'lucide-react';
+import { useDeals } from '../lib/api';
 
-interface Deal {
-  id: number;
-  title: string;
-  location: string;
-  originalPrice: number;
-  price: number;
-  image: string;
-  tag: string;
-  type: 'featured' | 'small' | 'medium';
-  description?: string;
-}
 
 export default function Deals() {
-  const [deals, setDeals] = useState<Deal[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: deals = [], isLoading, isError, error } = useDeals();
 
-  useEffect(() => {
-    fetch('/api/deals')
-      .then((res) => res.json())
-      .then((data) => {
-        setDeals(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error('Error fetching deals:', err);
-        setLoading(false);
-      });
-  }, []);
+  if (isLoading) {
+    return (
+      <main className="flex-grow w-full flex flex-col items-center justify-center min-h-[400px]">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="font-body-lg text-on-surface-variant">Loading exclusive escapes...</p>
+      </main>
+    );
+  }
 
-  if (loading) {
+  if (isError) {
+    return (
+      <main className="flex-grow w-full flex flex-col items-center justify-center min-h-[400px]">
+        <p className="font-h3 text-error mb-2">Failed to load deals</p>
+        <p className="font-body-md text-on-surface-variant">{error instanceof Error ? error.message : 'Unknown error'}</p>
+      </main>
+    );
+  }
+
+  if (deals.length === 0) {
     return (
       <main className="flex-grow w-full flex items-center justify-center min-h-[400px]">
-        <p className="font-body-lg text-on-surface-variant">Loading exclusive escapes...</p>
+        <p className="font-body-lg text-on-surface-variant">No exclusive escapes available at the moment.</p>
       </main>
     );
   }

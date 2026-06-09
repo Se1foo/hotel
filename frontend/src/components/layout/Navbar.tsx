@@ -3,10 +3,8 @@ import { Search } from 'lucide-react';
 
 const NAV_LINKS = [
   { name: 'Home', path: '/' },
-  { name: 'Promo', path: '/promo' },
-  { name: 'Booking', path: '/booking' },
-  { name: 'Special', path: '/special' },
-  { name: 'Blog', path: '/blog' },
+  { name: 'Rooms', path: '/rooms' },
+  { name: 'Deals', path: '/deals' },
   { name: 'Contact us', path: '/contact' },
 ];
 

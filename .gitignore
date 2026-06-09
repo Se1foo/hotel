@@ -56,6 +56,15 @@ frontend/*.local
 .env.development.local
 .env.test.local
 .env.production.local
+Development_Plan.md
+Development_Plan.pdf
+Development_Plan*.pdf
+Development_Plan/
+development_plan/
+**/Development_Plan/
+**/development_plan/
+**/Development_Plan*.pdf
+**/development_plan*.pdf
 plan.txt
 update.txt
 
