@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../auth/AuthContext';
-import { LogOut, User } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 
 const NAV_LINKS = [
   { name: 'Home', path: '/' },
@@ -13,7 +13,7 @@ const NAV_LINKS = [
 
 export const Navbar = () => {
   const location = useLocation();
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
 
   return (
     <header className="absolute top-0 w-full z-50 bg-surface">
@@ -76,26 +76,13 @@ export const Navbar = () => {
               </Link>
             </>
           ) : (
-            <div className="flex items-center gap-4">
-              {/* User Avatar */}
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-[#8B6B10] flex items-center justify-center text-white text-xs font-bold shadow-sm">
-                  {user?.name ? user.name.charAt(0).toUpperCase() : <User className="w-4 h-4" />}
-                </div>
-                <span className="text-[14px] font-bold text-[#1A1A1A] max-w-[100px] truncate">
-                  {user?.name || 'Guest'}
-                </span>
-              </div>
-              
-              {/* Logout Icon Button */}
-              <button
-                onClick={logout}
-                title="Log Out"
-                className="text-gray-500 hover:text-red-600 transition-colors p-2 rounded-full hover:bg-red-50"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
-            </div>
+            <button
+              onClick={logout}
+              className="bg-white border border-[#F0F0F0] text-[#1A1A1A] font-bold text-[14px] px-6 py-2.5 rounded-full hover:bg-[#F9F9F9] hover:text-red-600 hover:border-red-200 transition-all shadow-sm flex items-center gap-2"
+            >
+              <LogOut className="w-4 h-4" />
+              Log Out
+            </button>
           )}
         </div>
         

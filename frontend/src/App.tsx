@@ -11,9 +11,12 @@ import { TestimonialsSection } from './components/home/TestimonialsSection';
 
 import DealsPage from './pages/Deals';
 import DestinationsPage from './pages/Destinations';
+import DestinationDetailsPage from './pages/DestinationDetails';
 import MyTripsPage from './pages/MyTrips';
 import LoginPage from './pages/Login';
 import SignUpPage from './pages/SignUp';
+import VerifyEmailPage from './pages/VerifyEmail';
+import ContactPage from './pages/Contact';
 
 import { AuthProvider } from './components/auth/AuthContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
@@ -58,6 +61,8 @@ function AnimatedRoutes() {
         <Route path="/" element={<PageWrapper><HomePage /></PageWrapper>} />
         <Route path="/deals" element={<PageWrapper><DealsPage /></PageWrapper>} />
         <Route path="/destinations" element={<PageWrapper><DestinationsPage /></PageWrapper>} />
+        <Route path="/destination/:id" element={<PageWrapper><DestinationDetailsPage /></PageWrapper>} />
+        <Route path="/contact" element={<PageWrapper><ContactPage /></PageWrapper>} />
         <Route
           path="/trips"
           element={
@@ -85,6 +90,14 @@ function AnimatedRoutes() {
               <ProtectedRoute redirectIfAuth>
                 <SignUpPage />
               </ProtectedRoute>
+            </PageWrapper>
+          }
+        />
+        <Route
+          path="/verify-email"
+          element={
+            <PageWrapper>
+              <VerifyEmailPage />
             </PageWrapper>
           }
         />

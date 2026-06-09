@@ -8,6 +8,7 @@ const router = Router();
 // Zod schema for Trip
 const tripSchema = z.object({
   tripId: z.string(),
+  destinationId: z.number().optional(),
   destination: z.string(),
   title: z.string(),
   checkIn: z.string(),

@@ -8,6 +8,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  googleLogin: (credential: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -34,16 +35,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const register = async (name: string, email: string, password: string) => {
+  const googleLogin = async (credential: string) => {
     setIsLoading(true);
     try {
-      const response = await api.post('/auth/register', { name, email, password });
-      const { accessToken, user: registeredUser } = response.data;
+      const response = await api.post('/auth/google', { credential });
+      const { accessToken, user: loggedUser } = response.data;
       setAccessToken(accessToken);
-      setUser(registeredUser);
+      setUser(loggedUser);
     } catch (error) {
       setAccessToken(null);
       setUser(null);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const register = async (name: string, email: string, password: string) => {
+    setIsLoading(true);
+    try {
+      await api.post('/auth/register', { name, email, password });
+      // We do not auto-login anymore, user must verify email.
+    } catch (error) {
       throw error;
     } finally {
       setIsLoading(false);
@@ -103,6 +116,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isAuthenticated: !!user,
         isLoading,
         login,
+        googleLogin,
         register,
         logout,
       }}

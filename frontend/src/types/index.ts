@@ -22,6 +22,7 @@ export interface Destination {
   amenities: string[];
   price: number;
   rating: number;
+  userRatings?: { userId: string; rating: number }[];
   image: string;
   tags: string[];
 }

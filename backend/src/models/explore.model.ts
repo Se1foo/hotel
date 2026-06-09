@@ -10,6 +10,7 @@ export interface IDestination extends Document {
   amenities: string[];
   price: number;
   rating: number;
+  userRatings: { userId: string; rating: number }[];
   image: string;
   tags: string[];
 }
@@ -24,6 +25,10 @@ const DestinationSchema: Schema = new Schema({
   amenities: { type: [String], required: true },
   price: { type: Number, required: true },
   rating: { type: Number, required: true },
+  userRatings: [{
+    userId: { type: Schema.Types.ObjectId, ref: 'User' },
+    rating: { type: Number, required: true }
+  }],
   image: { type: String, required: true },
   tags: { type: [String], default: [] }
 }, {

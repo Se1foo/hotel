@@ -73,7 +73,7 @@ export const RoomCard = ({ room }: RoomCardProps) => {
             <span className="text-[#666666] text-[13px] font-medium">/night</span>
           </div>
           <Link 
-            to={`/destinations/${room.id}`}
+            to={`/destination/${room.id}`}
             className="flex items-center gap-1.5 font-bold text-[#8B6B10] hover:text-[#70550B] transition-colors group/link text-[14px]"
           >
             Select Room 

@@ -52,7 +52,7 @@ export const Hero = () => {
             </h1>
             
             <p className="font-body-lg text-on-surface-variant max-w-[500px] mb-6">
-              We provide world-class hospitality and unforgettable experiences for our guests:
+              Experience world-class hospitality:
             </p>
             
             <ul className="space-y-3 mb-10 font-body-lg text-on-surface">
@@ -66,7 +66,7 @@ export const Hero = () => {
                 <svg className="w-5 h-5 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
-                Exclusive spa and wellness
+                24/7 personal service
               </li>
               <li className="flex items-center gap-3">
                 <svg className="w-5 h-5 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">

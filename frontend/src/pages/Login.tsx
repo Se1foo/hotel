@@ -6,6 +6,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../components/auth/AuthContext';
+import { GoogleLogin } from '@react-oauth/google';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -15,7 +16,7 @@ const loginSchema = z.object({
 type LoginFormInput = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, googleLogin } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
@@ -150,6 +151,40 @@ export default function LoginPage() {
             )}
           </button>
         </form>
+
+        <div className="mt-6 flex flex-col gap-4">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">Or continue with</span>
+            </div>
+          </div>
+          
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={async (credentialResponse) => {
+                if (credentialResponse.credential) {
+                  setIsLoading(true);
+                  try {
+                    await googleLogin(credentialResponse.credential);
+                    navigate(from, { replace: true });
+                  } catch (err: any) {
+                    setErrorMessage(err.response?.data?.error || 'Google login failed');
+                  } finally {
+                    setIsLoading(false);
+                  }
+                }
+              }}
+              onError={() => {
+                setErrorMessage('Google Login Failed');
+              }}
+              theme="outline"
+              size="large"
+            />
+          </div>
+        </div>
 
         {/* Toggle Sign Up */}
         <div className="text-center mt-6 text-sm text-gray-500">

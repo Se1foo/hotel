@@ -4,8 +4,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, Mail, Lock, Eye, EyeOff, AlertTriangle } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useAuth } from '../components/auth/AuthContext';
+import { GoogleLogin } from '@react-oauth/google';
 
 const signUpSchema = z
   .object({
@@ -28,11 +29,12 @@ const signUpSchema = z
 type SignUpFormInput = z.infer<typeof signUpSchema>;
 
 export default function SignUpPage() {
-  const { register: signUp } = useAuth();
+  const { register: signUp, googleLogin } = useAuth();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -46,9 +48,10 @@ export default function SignUpPage() {
   const onSubmit = async (data: SignUpFormInput) => {
     setIsLoading(true);
     setErrorMessage(null);
+    setSuccessMessage(null);
     try {
       await signUp(data.name, data.email, data.password);
-      navigate('/', { replace: true });
+      setSuccessMessage('Registration successful! Please check your email to verify your account.');
     } catch (err: any) {
       setErrorMessage(
         err.response?.data?.error || 'Registration failed. Please check details and try again.'
@@ -85,6 +88,18 @@ export default function SignUpPage() {
           >
             <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
             <span>{errorMessage}</span>
+          </motion.div>
+        )}
+
+        {/* Success Alert */}
+        {successMessage && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-2xl flex items-start gap-3 text-sm"
+          >
+            <CheckCircle className="w-5 h-5 shrink-0 mt-0.5" />
+            <span>{successMessage}</span>
           </motion.div>
         )}
 
@@ -204,6 +219,40 @@ export default function SignUpPage() {
             )}
           </button>
         </form>
+
+        <div className="mt-6 flex flex-col gap-4">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">Or continue with</span>
+            </div>
+          </div>
+          
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={async (credentialResponse) => {
+                if (credentialResponse.credential) {
+                  setIsLoading(true);
+                  try {
+                    await googleLogin(credentialResponse.credential);
+                    navigate('/', { replace: true });
+                  } catch (err: any) {
+                    setErrorMessage(err.response?.data?.error || 'Google registration failed');
+                  } finally {
+                    setIsLoading(false);
+                  }
+                }
+              }}
+              onError={() => {
+                setErrorMessage('Google Registration Failed');
+              }}
+              theme="outline"
+              size="large"
+            />
+          </div>
+        </div>
 
         {/* Toggle Login */}
         <div className="text-center mt-6 text-sm text-gray-500">

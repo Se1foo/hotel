@@ -6,14 +6,14 @@ const TESTIMONIALS = [
   {
     id: 1,
     name: 'Helen Worden',
-    text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam',
+    text: 'StayEase made our anniversary trip absolutely perfect. The hotel recommendations were spot on and the booking process was completely seamless.',
     image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400',
     rating: 5,
   },
   {
     id: 2,
     name: 'Luke Coursey',
-    text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam',
+    text: 'I travel constantly for work and this platform has been a game changer. Exclusive deals and a gorgeous interface that actually works.',
     image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400',
     rating: 5,
   },
@@ -42,7 +42,7 @@ export const TestimonialsSection = () => {
       </div>
 
       <div className="max-w-[1280px] mx-auto px-5 md:px-[60px] relative z-10">
-        <h2 className="font-h2 text-headline-md text-on-surface mb-12">What our costumers say:</h2>
+        <h2 className="font-h2 text-headline-md text-on-surface mb-12">What our customers say:</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           {TESTIMONIALS.map((t, index) => (

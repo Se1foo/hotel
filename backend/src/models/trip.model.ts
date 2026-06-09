@@ -3,6 +3,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface ITrip extends Document {
   user: mongoose.Types.ObjectId;
   tripId: string; // e.g., 'TRP-10492'
+  destinationId?: number;
   destination: string;
   title: string;
   checkIn: string;
@@ -24,6 +25,10 @@ const tripSchema = new Schema<ITrip>(
     tripId: {
       type: String,
       required: true,
+    },
+    destinationId: {
+      type: Number,
+      required: false,
     },
     destination: {
       type: String,
