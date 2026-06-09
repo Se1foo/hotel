@@ -1,10 +1,11 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const NAV_LINKS = [
   { name: 'Home', path: '/' },
-  { name: 'Rooms', path: '/rooms' },
+  { name: 'Destinations', path: '/destinations' },
   { name: 'Deals', path: '/deals' },
+  { name: 'My Trips', path: '/trips' },
   { name: 'Contact us', path: '/contact' },
 ];
 
@@ -43,23 +44,25 @@ export const Navbar = () => {
               >
                 {link.name}
                 {isActive && (
-                  <span className="absolute bottom-0 left-0 w-full h-[2px] bg-primary rounded-full"></span>
+                  <motion.span 
+                    layoutId="navbar-indicator"
+                    className="absolute bottom-0 left-0 w-full h-[2px] bg-primary rounded-full"
+                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                  />
                 )}
               </Link>
             );
           })}
         </nav>
 
-        {/* Search */}
-        <div className="hidden md:flex items-center">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search"
-              className="bg-surface-container-high/80 text-on-surface font-body-md pl-4 pr-10 py-2 rounded-full border-none focus:outline-none focus:ring-2 focus:ring-primary/50 w-48 placeholder:text-on-surface-variant backdrop-blur-sm"
-            />
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant" />
-          </div>
+        {/* Auth Buttons */}
+        <div className="hidden md:flex items-center gap-4">
+          <button className="font-bold text-[14px] text-[#4A4A4A] hover:text-[#1A1A1A] transition-colors px-2">
+            Login
+          </button>
+          <button className="bg-[#1A1A1A] text-white font-bold text-[14px] px-6 py-2.5 rounded-full hover:bg-[#8B6B10] transition-colors shadow-sm">
+            Sign Up
+          </button>
         </div>
         
         {/* Mobile menu toggle placeholder */}

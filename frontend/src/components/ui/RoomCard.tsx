@@ -1,4 +1,4 @@
-import { ArrowRight, BedDouble, Users, Tv, Wifi, Flame, Building2, Star } from 'lucide-react';
+import { ArrowRight, BedDouble, Users, Tv, Wifi, Flame, Building2, Star, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Destination } from '../../types';
 
@@ -38,6 +38,10 @@ export const RoomCard = ({ room }: RoomCardProps) => {
 
       <div className="p-6 md:p-7 flex-grow flex flex-col justify-between">
         <div>
+          <div className="flex items-center gap-1 text-[#8B6B10] mb-2 font-bold text-[11px] uppercase tracking-widest">
+            <MapPin className="w-3.5 h-3.5" />
+            <span>{room.location}</span>
+          </div>
           <h3 className="text-[22px] font-bold text-[#1A1A1A] mb-2 tracking-tight">{room.title}</h3>
           <p className="text-[#666666] mb-6 leading-relaxed line-clamp-2 min-h-[48px] text-[15px] font-normal">
             {room.description}
@@ -69,7 +73,7 @@ export const RoomCard = ({ room }: RoomCardProps) => {
             <span className="text-[#666666] text-[13px] font-medium">/night</span>
           </div>
           <Link 
-            to={`/rooms/${room.id}`}
+            to={`/destinations/${room.id}`}
             className="flex items-center gap-1.5 font-bold text-[#8B6B10] hover:text-[#70550B] transition-colors group/link text-[14px]"
           >
             Select Room 
