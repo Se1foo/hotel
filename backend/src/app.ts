@@ -1,15 +1,26 @@
 import cors from 'cors';
 import express from 'express';
 import path from 'path';
+import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 import { registerRoutes } from './routes';
 import { errorHandler } from './middlewares/error.middleware';
 import { apiNotFound } from './middlewares/notFound.middleware';
+import { env } from './config/env';
 
 export function createApp() {
   const app = express();
 
-  app.use(cors());
+  app.use(helmet());
+  app.use(
+    cors({
+      origin: env.frontendUrl,
+      credentials: true,
+    })
+  );
+  app.use(cookieParser());
   app.use(express.json());
+  
   registerRoutes(app);
 
   app.use(express.static(path.join(__dirname, '../public')));

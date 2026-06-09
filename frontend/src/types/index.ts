@@ -25,3 +25,12 @@ export interface Destination {
   image: string;
   tags: string[];
 }
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  savedDeals: string[];
+  createdAt: string;
+  updatedAt: string;
+}
