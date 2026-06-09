@@ -34,3 +34,17 @@ export interface User {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface Trip {
+  _id: string;
+  tripId: string;
+  destination: string;
+  title: string;
+  checkIn: string;
+  checkOut: string;
+  guests: string;
+  status: 'Confirmed' | 'Processing' | 'Cancelled';
+  image: string;
+  startDay: number;
+  endDay: number;
+}

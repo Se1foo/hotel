@@ -1,5 +1,6 @@
 import type { Express } from 'express';
 import authRouter from './auth.routes';
+import tripRouter from './trip.routes';
 import bookingsRouter from './bookings.routes';
 import dealsRouter from './deals.routes';
 import healthRouter from './health.routes';
@@ -11,5 +12,6 @@ export function registerRoutes(app: Express): void {
   app.use('/api/explore', exploreRouter);
   app.use('/api/deals', dealsRouter);
   app.use('/api/bookings', bookingsRouter);
+  app.use('/api/trips', tripRouter);
   app.use('/api/auth', authLimiter, authRouter);
 }

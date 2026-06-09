@@ -1,37 +1,36 @@
 import { useState } from 'react';
-import { Calendar, List, MapPin, ArrowRight, Clock } from 'lucide-react';
+import { Calendar, List, MapPin, ArrowRight, Clock, LogIn } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-// Mock Data
-const UPCOMING_TRIPS = [
-  {
-    id: 'TRP-10492',
-    destination: 'Swiss Alps',
-    title: 'Alpine Escape Suite',
-    checkIn: 'Oct 12, 2026',
-    checkOut: 'Oct 18, 2026',
-    guests: '2 Adults',
-    status: 'Confirmed',
-    image: 'https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&q=80&w=800',
-    startDay: 12, // simple mock for calendar
-    endDay: 18,
-  },
-  {
-    id: 'TRP-88312',
-    destination: 'Kyoto, Japan',
-    title: 'Zen Garden Pavilion',
-    checkIn: 'Nov 05, 2026',
-    checkOut: 'Nov 12, 2026',
-    guests: '2 Adults',
-    status: 'Processing',
-    image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=800',
-    startDay: -1, // out of current month
-    endDay: -1,
-  }
-];
+import { useAuth } from '../components/auth/AuthContext';
+import { useTrips } from '../lib/api';
+import { Link } from 'react-router-dom';
 
 export default function MyTripsPage() {
   const [viewMode, setViewMode] = useState<'calendar' | 'itinerary'>('itinerary');
+  const { isAuthenticated } = useAuth();
+  const { data: upcomingTrips = [], isLoading } = useTrips(isAuthenticated);
+
+  if (!isAuthenticated) {
+    return (
+      <div className="bg-[#FAF9F6] min-h-screen pt-40 pb-16 flex flex-col items-center">
+        <LogIn className="w-16 h-16 text-[#8B6B10] mb-6" />
+        <h2 className="text-3xl font-extrabold text-[#1A1A1A] mb-4">Log in to view your trips</h2>
+        <p className="text-[#666666] mb-8">You need an account to manage your itineraries and bookings.</p>
+        <Link to="/login" className="px-8 py-3 bg-[#1A1A1A] text-white rounded-full font-bold hover:bg-[#8B6B10] transition-colors">
+          Log In or Sign Up
+        </Link>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="bg-[#FAF9F6] min-h-screen pt-40 pb-16 flex flex-col items-center justify-center">
+        <div className="w-10 h-10 border-4 border-[#8B6B10] border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="text-[#666666] font-bold">Loading your trips...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#FAF9F6] min-h-screen pt-32 pb-16">
@@ -96,8 +95,8 @@ export default function MyTripsPage() {
               transition={{ duration: 0.2 }}
               className="flex flex-col gap-6"
             >
-              {UPCOMING_TRIPS.map((trip) => (
-                <div key={trip.id} className="bg-white rounded-2xl p-4 md:p-6 border border-[#F0F0F0] shadow-sm hover:shadow-md transition-shadow flex flex-col md:flex-row gap-6 group">
+              {upcomingTrips.map((trip) => (
+                <div key={trip._id} className="bg-white rounded-2xl p-4 md:p-6 border border-[#F0F0F0] shadow-sm hover:shadow-md transition-shadow flex flex-col md:flex-row gap-6 group">
                   
                   {/* Thumbnail */}
                   <div className="w-full md:w-[240px] h-[160px] rounded-xl overflow-hidden shrink-0 relative">
@@ -115,7 +114,7 @@ export default function MyTripsPage() {
                         <span>{trip.destination}</span>
                       </div>
                       <h3 className="text-[22px] font-bold text-[#1A1A1A] tracking-tight">{trip.title}</h3>
-                      <p className="text-[#666666] text-[14px] mt-1">Reservation #{trip.id}</p>
+                      <p className="text-[#666666] text-[14px] mt-1">Reservation #{trip.tripId}</p>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-6 mt-6 pt-6 border-t border-[#F0F0F0]">
@@ -177,9 +176,10 @@ export default function MyTripsPage() {
                 {/* Days of Month */}
                 {Array.from({ length: 31 }).map((_, i) => {
                   const day = i + 1;
-                  const isTripStart = UPCOMING_TRIPS[0].startDay === day;
-                  const isTripEnd = UPCOMING_TRIPS[0].endDay === day;
-                  const isTripMiddle = day > UPCOMING_TRIPS[0].startDay && day < UPCOMING_TRIPS[0].endDay;
+                  const firstTrip = upcomingTrips[0];
+                  const isTripStart = firstTrip?.startDay === day;
+                  const isTripEnd = firstTrip?.endDay === day;
+                  const isTripMiddle = firstTrip && day > firstTrip.startDay && day < firstTrip.endDay;
                   
                   return (
                     <div 
@@ -196,7 +196,7 @@ export default function MyTripsPage() {
                       
                       {isTripStart && (
                         <div className="absolute bottom-2 left-2 right-2 bg-[#8B6B10] text-white text-[10px] font-bold px-2 py-1.5 rounded truncate shadow-sm">
-                          {UPCOMING_TRIPS[0].destination}
+                          {upcomingTrips[0]?.destination}
                         </div>
                       )}
                       {(isTripMiddle || isTripEnd) && (

@@ -30,3 +30,19 @@ export const useDestinations = () => {
     queryFn: fetchDestinations,
   });
 };
+
+import axiosApi from './axios';
+import type { Trip } from '../types';
+
+export const fetchTrips = async (): Promise<Trip[]> => {
+  const response = await axiosApi.get('/trips');
+  return response.data;
+};
+
+export const useTrips = (isAuthenticated: boolean) => {
+  return useQuery({
+    queryKey: ['trips'],
+    queryFn: fetchTrips,
+    enabled: isAuthenticated, // Only fetch if user is logged in
+  });
+};
