@@ -20,9 +20,9 @@ export const Footer = () => {
 
           {/* Links */}
           <div className="flex items-center gap-8 text-[14px] font-bold text-[#4A4A4A]">
-            <Link to="/privacy" className="hover:text-[#8B6B10] transition-colors">Privacy Policy</Link>
-            <Link to="/terms" className="hover:text-[#8B6B10] transition-colors">Terms of Service</Link>
-            <Link to="/support" className="hover:text-[#8B6B10] transition-colors">Contact Support</Link>
+            <span className="cursor-default hover:text-[#8B6B10] transition-colors">Privacy Policy</span>
+            <span className="cursor-default hover:text-[#8B6B10] transition-colors">Terms of Service</span>
+            <Link to="/contact" className="hover:text-[#8B6B10] transition-colors">Contact Support</Link>
           </div>
 
         </div>
