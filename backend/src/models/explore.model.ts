@@ -13,6 +13,11 @@ export interface IDestination extends Document {
   userRatings: { userId: string; rating: number }[];
   image: string;
   tags: string[];
+  // Deal fields
+  isDeal?: boolean;
+  originalPrice?: number;
+  dealTag?: string;
+  dealType?: 'featured' | 'small' | 'medium';
 }
 
 const DestinationSchema: Schema = new Schema({
@@ -30,7 +35,11 @@ const DestinationSchema: Schema = new Schema({
     rating: { type: Number, required: true }
   }],
   image: { type: String, required: true },
-  tags: { type: [String], default: [] }
+  tags: { type: [String], default: [] },
+  isDeal: { type: Boolean, default: false },
+  originalPrice: { type: Number },
+  dealTag: { type: String },
+  dealType: { type: String, enum: ['featured', 'small', 'medium'] }
 }, {
   timestamps: true
 });

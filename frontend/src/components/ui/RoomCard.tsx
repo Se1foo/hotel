@@ -29,7 +29,12 @@ export const RoomCard = ({ room }: RoomCardProps) => {
             <Star className="w-3.5 h-3.5 fill-[#E1A624] text-[#E1A624]" /> {room.rating}
           </div>
         )}
-        {room.price >= 1000 && (
+        {room.isDeal && room.dealTag && (
+          <div className="absolute top-4 right-4 bg-[#1A1A1A] text-white font-semibold text-xs px-3 py-1.5 rounded-full shadow-sm">
+            {room.dealTag}
+          </div>
+        )}
+        {room.price >= 1000 && !room.isDeal && (
           <div className="absolute top-4 left-4 bg-[#8B6B10] text-white font-semibold text-xs px-3 py-1 rounded shadow-sm">
             Premium
           </div>
@@ -68,9 +73,14 @@ export const RoomCard = ({ room }: RoomCardProps) => {
         
         {/* Footer */}
         <div className="flex items-center justify-between pt-5 border-t border-[#F0F0F0]">
-          <div className="flex items-baseline gap-1">
-            <span className="text-[24px] font-bold text-[#1A1A1A]">${room.price}</span>
-            <span className="text-[#666666] text-[13px] font-medium">/night</span>
+          <div className="flex flex-col">
+            {room.isDeal && room.originalPrice && (
+              <span className="text-[13px] font-medium text-gray-400 line-through">${room.originalPrice.toLocaleString()}</span>
+            )}
+            <div className="flex items-baseline gap-1">
+              <span className="text-[24px] font-bold text-[#1A1A1A]">${room.price.toLocaleString()}</span>
+              <span className="text-[#666666] text-[13px] font-medium">/night</span>
+            </div>
           </div>
           <Link 
             to={`/destination/${room.id}`}

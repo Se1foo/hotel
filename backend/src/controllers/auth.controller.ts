@@ -189,7 +189,7 @@ export async function getProfile(req: AuthenticatedRequest, res: Response): Prom
 }
 
 import { OAuth2Client } from 'google-auth-library';
-const client = new OAuth2Client(process.env.VITE_GOOGLE_CLIENT_ID || 'dummy-client-id');
+const client = new OAuth2Client(process.env.VITE_GOOGLE_CLIENT_ID || '571885882657-mjfudvbgfet2fe89gm8dmv4rphra1kgb.apps.googleusercontent.com');
 
 export async function verifyEmail(req: Request, res: Response): Promise<void> {
   try {
@@ -222,26 +222,52 @@ export async function verifyEmail(req: Request, res: Response): Promise<void> {
 
 export async function googleLogin(req: Request, res: Response): Promise<void> {
   try {
-    const { credential } = req.body;
-    if (!credential) {
-      res.status(400).json({ error: 'Google credential missing' });
+    const { credential, access_token } = req.body;
+    if (!credential && !access_token) {
+      res.status(400).json({ error: 'Google credential or access_token missing' });
       return;
     }
 
-    // Verify token with Google
-    const ticket = await client.verifyIdToken({
-      idToken: credential,
-      audience: process.env.VITE_GOOGLE_CLIENT_ID || 'dummy-client-id',
-    });
+    let email = '';
+    let name = '';
+    let googleId = '';
 
-    const payload = ticket.getPayload();
-    if (!payload || !payload.email) {
-      res.status(400).json({ error: 'Invalid Google token payload' });
-      return;
+    if (credential) {
+      // Verify token with Google
+      const ticket = await client.verifyIdToken({
+        idToken: credential,
+        audience: process.env.VITE_GOOGLE_CLIENT_ID || '571885882657-mjfudvbgfet2fe89gm8dmv4rphra1kgb.apps.googleusercontent.com',
+      });
+
+      const payload = ticket.getPayload();
+      if (!payload || !payload.email) {
+        res.status(400).json({ error: 'Invalid Google token payload' });
+        return;
+      }
+
+      email = payload.email.toLowerCase().trim();
+      name = payload.name || 'Google User';
+      googleId = payload.sub;
+    } else if (access_token) {
+      try {
+        const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${access_token}` }
+        });
+        const userInfo = await userInfoRes.json();
+        
+        if (!userInfo || !userInfo.email) {
+          res.status(400).json({ error: 'Invalid Google user info' });
+          return;
+        }
+
+        email = userInfo.email.toLowerCase().trim();
+        name = userInfo.name || 'Google User';
+        googleId = userInfo.sub;
+      } catch (err) {
+        res.status(400).json({ error: 'Failed to fetch Google user info' });
+        return;
+      }
     }
-
-    const email = payload.email.toLowerCase().trim();
-    const name = payload.name || 'Google User';
 
     let user = await UserModel.findOne({ email });
 
@@ -252,7 +278,7 @@ export async function googleLogin(req: Request, res: Response): Promise<void> {
         email,
         isVerified: true, // Trusted from Google
         authProvider: 'google',
-        googleId: payload.sub,
+        googleId: googleId,
         savedDeals: [],
         refreshTokens: [],
       });
@@ -260,7 +286,7 @@ export async function googleLogin(req: Request, res: Response): Promise<void> {
       // If user exists but used local auth, we might want to link it
       if (user.authProvider !== 'google') {
         user.authProvider = 'google';
-        user.googleId = payload.sub;
+        user.googleId = googleId;
         user.isVerified = true; // Google verified it
       }
     }
@@ -276,8 +302,12 @@ export async function googleLogin(req: Request, res: Response): Promise<void> {
       accessToken,
       user: user.toJSON(),
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Google Auth Error:', error);
-    res.status(401).json({ error: 'Google authentication failed' });
+    res.status(401).json({
+      error: 'Google authentication failed',
+      details: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
+    });
   }
 }

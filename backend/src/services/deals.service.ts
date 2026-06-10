@@ -1,15 +1,16 @@
-import { DealModel, IDeal } from '../models/deal.model';
+import { DestinationModel, IDestination } from '../models/explore.model';
 
-export async function getDeals(): Promise<IDeal[]> {
-  return DealModel.find().exec();
+export async function getDeals() {
+  return DestinationModel.find({ isDeal: true }).exec();
 }
 
-export async function addDeal(dealData: Omit<IDeal, 'id' | '_id'>): Promise<IDeal> {
-  const latestDeal = await DealModel.findOne().sort({ id: -1 }).exec();
+export async function addDeal(dealData: any) {
+  const latestDeal = await DestinationModel.findOne().sort({ id: -1 }).exec();
   const nextId = latestDeal ? latestDeal.id + 1 : 1;
   
-  const newDeal = new DealModel({
+  const newDeal = new DestinationModel({
     ...dealData,
+    isDeal: true,
     id: nextId
   });
   

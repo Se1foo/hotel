@@ -1,9 +1,11 @@
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useMousePosition } from '../../lib/useMousePosition';
 import heroImg from '../../images/hero_pool.png';
 
 export const Hero = () => {
   const mouse = useMousePosition();
+  const navigate = useNavigate();
 
   return (
     <section className="relative pt-[110px] pb-[60px] bg-surface overflow-hidden">
@@ -77,7 +79,10 @@ export const Hero = () => {
             </ul>
             
             <div className="flex flex-wrap items-center gap-6">
-              <button className="bg-secondary text-on-secondary font-label-bold px-8 py-4 rounded-full hover:bg-primary hover:text-on-primary transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md hover:scale-102">
+              <button 
+                onClick={() => navigate('/destinations')}
+                className="bg-secondary text-on-secondary font-label-bold px-8 py-4 rounded-full hover:bg-primary hover:text-on-primary transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md hover:scale-102"
+              >
                 Book your room
               </button>
             </div>

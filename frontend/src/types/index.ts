@@ -25,6 +25,15 @@ export interface Destination {
   userRatings?: { userId: string; rating: number }[];
   image: string;
   tags: string[];
+  // Deal fields
+  isDeal?: boolean;
+  originalPrice?: number;
+  dealTag?: string;
+  dealType?: DealType;
+}
+
+export interface Deal extends Destination {
+  tag?: string; // mapping for compatibility if needed
 }
 
 export interface User {

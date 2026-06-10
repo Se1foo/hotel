@@ -38,6 +38,29 @@ export const TestimonialsSection = () => {
           </svg>
         </div>
         
+        {/* Yellow dots grid middle left */}
+        <div 
+          className="absolute top-[45%] left-[5%] grid grid-cols-3 gap-3 opacity-30 transition-transform duration-500 ease-out"
+          style={{
+            transform: `translate3d(${mouse.x * 8}px, ${mouse.y * 8}px, 0)`,
+          }}
+        >
+          {[...Array(9)].map((_, i) => (
+            <div key={`dot-${i}`} className="w-2 h-2 rounded-full bg-primary"></div>
+          ))}
+        </div>
+
+        {/* Double X marks at bottom right */}
+        <div 
+          className="absolute bottom-[20%] right-[10%] flex gap-4 text-on-surface-variant/40 font-medium text-2xl select-none transition-transform duration-500 ease-out"
+          style={{
+            transform: `translate3d(${mouse.x * 5}px, ${mouse.y * 5}px, 0)`,
+          }}
+        >
+          <span>x</span>
+          <span>x</span>
+        </div>
+        
         {/* End Background Shapes */}
       </div>
 

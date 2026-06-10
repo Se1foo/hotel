@@ -35,10 +35,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const googleLogin = async (credential: string) => {
+  const googleLogin = async (token: string, isAccessToken: boolean = false) => {
     setIsLoading(true);
     try {
-      const response = await api.post('/auth/google', { credential });
+      const payload = isAccessToken ? { access_token: token } : { credential: token };
+      const response = await api.post('/auth/google', payload);
       const { accessToken, user: loggedUser } = response.data;
       setAccessToken(accessToken);
       setUser(loggedUser);

@@ -29,10 +29,13 @@ function ScrollToTop() {
   return null;
 }
 
+import { HowItWorksSection } from './components/home/HowItWorksSection';
+
 function HomePage() {
   return (
     <>
       <Hero />
+      <HowItWorksSection />
       <RoomsSection />
       <TestimonialsSection />
     </>
