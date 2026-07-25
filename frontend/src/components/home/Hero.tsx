@@ -1,159 +1,137 @@
-import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Check } from 'lucide-react';
 import { useMousePosition } from '../../lib/useMousePosition';
-import heroImg from '../../images/hero_pool.png';
+import { Shell } from '../ui/Section';
+import { Button } from '../ui/Button';
+import { CrossMarks, DotGrid, PillOutline, Squiggle } from '../ui/Decor';
+import heroImage from '../../images/hero_pool.png';
 
-export const Hero = () => {
+const HIGHLIGHTS = [
+  'Premium ocean-view suites',
+  '24/7 personal concierge service',
+  'Fine dining and local cuisine',
+];
+
+export function Hero() {
   const mouse = useMousePosition();
-  const navigate = useNavigate();
 
   return (
-    <section className="relative pt-[110px] pb-[60px] bg-surface overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-0 overflow-hidden">
-        {/* Pencil squiggle on the far left */}
-        <div 
-          className="absolute top-[22%] left-[4%] transition-transform duration-500 ease-out"
-          style={{
-            transform: `translate3d(${mouse.x * 15}px, ${mouse.y * 15}px, 0)`,
-          }}
-        >
-          <svg className="w-24 h-16 text-surface-dim opacity-70" viewBox="0 0 100 60" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M10,25 Q20,10 35,30 T60,20 T80,40 T95,15" />
-          </svg>
-        </div>
-
-        {/* Pill outline on the left edge */}
-        <div 
-          className="absolute top-[42%] left-[-40px] w-24 h-9 border-2 border-surface-dim rounded-full opacity-70 transition-transform duration-500 ease-out"
-          style={{
-            transform: `translate3d(${mouse.x * 10}px, ${mouse.y * 10}px, 0)`,
-          }}
-        ></div>
-
-        {/* Double X marks at bottom center */}
-        <div 
-          className="absolute bottom-[10%] left-[40%] flex gap-4 text-on-surface-variant/80 font-medium text-xl transition-transform duration-500 ease-out select-none"
-          style={{
-            transform: `translate3d(${mouse.x * 6}px, ${mouse.y * 6}px, 0)`,
-          }}
-        >
-          <span>x</span>
-          <span>x</span>
-        </div>
+    /**
+     * Top padding is deliberately tight. At `pt-12 md:pt-16` the headline sat
+     * ~110px below the navbar, which pushed the whole column down far enough
+     * that the CTA row landed at the bottom edge of the viewport on a laptop.
+     * Starting higher keeps the buttons comfortably above the fold.
+     */
+    <section className="relative bg-canvas overflow-hidden pt-6 pb-20 md:pt-8 md:pb-24">
+      {/* Decorative geometry. Hidden below `lg` where it collided with the
+          headline and overflowed the viewport on small screens. */}
+      <div className="absolute inset-0 pointer-events-none z-0 hidden lg:block" aria-hidden="true">
+        <Squiggle className="top-[22%] left-[4%]" depth={15} />
+        <PillOutline className="top-[42%] left-[-40px]" depth={10} />
+        <CrossMarks className="bottom-[6%] left-[40%] text-xl" depth={6} />
       </div>
 
-      <div className="max-w-[1280px] mx-auto px-5 md:px-[60px] relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-[60px] items-center">
-          {/* Left Text Content */}
-          <div className="relative z-10">
-            <h1 className="font-h1 text-display-lg-mobile md:text-display-lg text-on-surface mb-6">
-              Elevate your <br className="hidden md:block" />
-              <span className="text-primary">Vacation</span> with our <br className="hidden md:block" />
-              Luxury Resort.
+      <Shell className="relative z-10">
+        {/*
+          `lg:items-stretch` rather than a fixed image height. Both columns take
+          the row height, so the image always finishes level with the CTA row.
+          A hardcoded height had to be re-tuned per breakpoint and still left the
+          buttons dangling ~50px below the image at 1024px, where the headline
+          wraps to an extra line.
+        */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-[60px] items-center lg:items-stretch">
+          <div className="relative z-10 lg:flex lg:flex-col lg:justify-center">
+            {/*
+              The largest step is held back to `xl`. At `lg` a 64px headline in a
+              ~410px column wrapped to four lines, inflating the text column and
+              unbalancing the row.
+            */}
+            <h1 className="text-display-sm md:text-display-md xl:text-display-lg text-ink mb-5">
+              Elevate your{' '}
+              {/* `text-amber` here was 1.8:1 against the canvas — a WCAG failure
+                  on the largest text on the site. `gold` keeps the warm accent
+                  at 4.9:1. */}
+              <span className="text-gold">Vacation</span> with our Luxury Resort.
             </h1>
-            
-            <p className="font-body-lg text-on-surface-variant max-w-[500px] mb-6">
+
+            <p className="text-lg text-ink-muted max-w-[500px] mb-5">
               Experience world-class hospitality:
             </p>
-            
-            <ul className="space-y-3 mb-10 font-body-lg text-on-surface">
-              <li className="flex items-center gap-3">
-                <svg className="w-5 h-5 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-                Premium ocean-view suites
-              </li>
-              <li className="flex items-center gap-3">
-                <svg className="w-5 h-5 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-                24/7 personal service
-              </li>
-              <li className="flex items-center gap-3">
-                <svg className="w-5 h-5 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-                Fine dining and local cuisine
-              </li>
+
+            <ul className="space-y-3 mb-8">
+              {HIGHLIGHTS.map((highlight) => (
+                <li key={highlight} className="flex items-center gap-3 text-lg text-ink">
+                  <span
+                    aria-hidden="true"
+                    className="shrink-0 w-6 h-6 rounded-full bg-gold-soft flex items-center justify-center text-gold"
+                  >
+                    <Check className="w-4 h-4" strokeWidth={3} />
+                  </span>
+                  {highlight}
+                </li>
+              ))}
             </ul>
-            
-            <div className="flex flex-wrap items-center gap-6">
-              <button 
-                onClick={() => navigate('/destinations')}
-                className="bg-secondary text-on-secondary font-label-bold px-8 py-4 rounded-full hover:bg-primary hover:text-on-primary transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md hover:scale-102"
-              >
+
+            {/* Full-width and stacked on the narrowest screens, where auto-width
+                buttons wrapped to two ragged lines of different widths. */}
+            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-4">
+              <Button size="lg" to="/destinations" className="w-full sm:w-auto">
                 Book your room
-              </button>
+              </Button>
+              <Button variant="outline" size="lg" to="/deals" className="w-full sm:w-auto">
+                View deals
+              </Button>
             </div>
           </div>
 
-          {/* Right Image Content */}
-          <div className="relative">
-            {/* Decorative dots top right - 5x2 grid of grey dots */}
-            <div 
-              className="absolute -top-6 -right-6 z-0 grid grid-cols-5 gap-2 opacity-60 transition-transform duration-300 ease-out"
-              style={{
-                transform: `translate3d(${mouse.x * 6}px, ${mouse.y * 6}px, 0)`,
-              }}
-            >
-              {[...Array(10)].map((_, i) => (
-                <div key={`dot-${i}`} className="w-1.5 h-1.5 rounded-full bg-secondary/40"></div>
-              ))}
-            </div>
+          <div className="relative lg:flex lg:flex-col">
+            <DotGrid className="-top-6 -right-6 z-0 opacity-60" columns={5} count={10} depth={6} />
 
-            {/* Decorative 2x2 grid of yellow circles/dots to the left */}
-            <div 
-              className="absolute -left-6 top-[45%] z-20 grid grid-cols-2 gap-2 transition-transform duration-300 ease-out"
-              style={{
-                transform: `translate3d(${mouse.x * -8}px, ${mouse.y * -8}px, 0)`,
-              }}
-            >
-              {[...Array(4)].map((_, i) => (
-                <motion.div 
-                  key={`ydot-${i}`} 
-                  className="w-3.5 h-3.5 rounded-full bg-primary shadow-sm"
-                  animate={{ scale: [1, 1.15, 1] }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    delay: i * 0.2,
-                    ease: "easeInOut"
-                  }}
-                ></motion.div>
-              ))}
-            </div>
+            <DotGrid
+              className="-left-6 top-[45%] z-20"
+              columns={2}
+              count={4}
+              depth={-8}
+              tone="amber"
+              pulse
+            />
 
-            {/* Main Image Container */}
-            <div 
-              className="relative z-10 w-full h-[440px] rounded-lg overflow-hidden shadow-ambient-elevated border-[12px] border-surface transition-transform duration-500 ease-out"
-              style={{
-                transform: `translate3d(${mouse.x * 3}px, ${mouse.y * 3}px, 0)`,
-              }}
+            <div
+              style={{ transform: `translate3d(${mouse.x * 3}px, ${mouse.y * 3}px, 0)` }}
+              className="relative z-10 w-full aspect-[4/3] lg:aspect-auto lg:flex-1 lg:min-h-[420px] rounded-lg overflow-hidden shadow-panel border-[12px] border-canvas transition-transform duration-500 ease-out"
             >
-              <img 
-                src={heroImg} 
-                alt="Hero Image" 
+              <img
+                src={heroImage}
+                // Was alt="Hero Image", which describes nothing.
+                alt="Sun loungers beside the resort's infinity pool at golden hour"
+                width={1200}
+                height={900}
+                // Above the fold: load eagerly and prioritise it as the LCP element.
+                loading="eager"
+                decoding="sync"
+                fetchPriority="high"
                 className="w-full h-full object-cover"
               />
-              
-              {/* Yellow bar bottom-left overlay (extending left) */}
-              <div className="absolute bottom-0 left-[-80px] w-[45%] h-6 bg-primary z-20"></div>
-              
-              {/* Yellow bar bottom-right overlay (extending right) */}
-              <div className="absolute bottom-0 right-[-80px] w-[45%] h-6 bg-primary z-20"></div>
+
+              {/* Amber is used purely as a graphic element here — no text on it. */}
+              <div
+                className="absolute bottom-0 left-[-80px] w-[45%] h-6 bg-amber z-20"
+                aria-hidden="true"
+              />
+              <div
+                className="absolute bottom-0 right-[-80px] w-[45%] h-6 bg-amber z-20"
+                aria-hidden="true"
+              />
             </div>
 
-            {/* Dark charcoal block bottom-right */}
-            <div 
-              className="absolute bottom-[-16px] right-[-16px] w-[50px] h-[50px] bg-secondary z-0 transition-transform duration-300 ease-out"
-              style={{
-                transform: `translate3d(${mouse.x * 4}px, ${mouse.y * 4}px, 0)`,
-              }}
-            ></div>
+            <motion.div
+              aria-hidden="true"
+              style={{ transform: `translate3d(${mouse.x * 4}px, ${mouse.y * 4}px, 0)` }}
+              className="absolute -bottom-4 -right-4 w-[50px] h-[50px] bg-ink z-0 transition-transform duration-300 ease-out"
+            />
           </div>
         </div>
-      </div>
+      </Shell>
     </section>
   );
-};
+}
