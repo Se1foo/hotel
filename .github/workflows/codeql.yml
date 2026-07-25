@@ -16,6 +16,10 @@ jobs:
     permissions:
       contents: read
       security-events: write
+      # Required by the action to read its own workflow run. Without it the
+      # analysis completes and uploads fine but the step still fails with
+      # "Resource not accessible by integration" from the workflow-runs API.
+      actions: read
 
     steps:
       - uses: actions/checkout@v4
@@ -30,6 +34,8 @@ jobs:
   audit:
     name: Dependency audit
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     strategy:
       # Report both packages even if one fails.
       fail-fast: false
@@ -43,8 +49,15 @@ jobs:
         with:
           node-version: 20
 
-      # Only high and critical advisories block; moderate findings in dev-only
-      # tooling would otherwise make the check permanently red.
-      - name: Audit ${{ matrix.package }}
+      # Installs are needed for `npm audit` to resolve the real dependency tree.
+      - name: Install ${{ matrix.package }}
         working-directory: ${{ matrix.package }}
-        run: npm audit --audit-level=high
+        run: npm ci
+
+      # Fails on any high/critical advisory that has not been explicitly
+      # reviewed. See .github/scripts/audit.mjs for the allowlist and reasoning —
+      # plain `npm audit --audit-level=high` cannot distinguish an unexamined
+      # advisory from one knowingly accepted, which leaves you choosing between a
+      # permanently red pipeline and no check at all.
+      - name: Audit ${{ matrix.package }}
+        run: node .github/scripts/audit.mjs ${{ matrix.package }}
