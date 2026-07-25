@@ -1,6 +1,6 @@
 import { startServer } from './server';
 
 startServer().catch((error) => {
-  console.error('Server failed to start:', error);
+  console.error('[server] Failed to start:', error);
   process.exit(1);
 });
