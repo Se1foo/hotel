@@ -1,59 +1,92 @@
-import type { Request, Response, NextFunction } from 'express';
-import { getDestinations, getDestinationById, rateDestinationById } from '../services/explore.service';
-import { AuthenticatedRequest } from '../middlewares/auth.middleware';
-import { TripModel } from '../models/trip.model';
+import type { NextFunction, Request, Response } from 'express';
+import {
+  deleteReview,
+  getDestinationById,
+  getDestinations,
+  upsertReview,
+} from '../services/explore.service';
+import { hasStayedAt } from '../services/trips.service';
+import { UserModel } from '../models/user.model';
+import type { AuthenticatedRequest } from '../middlewares/auth.middleware';
+import { DestinationIdParam, ReviewSchema } from '../utils/validation';
+import { HttpError } from '../utils/httpError';
 
-export async function listDestinations(_req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function listDestinations(
+  _req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    const destinations = await getDestinations();
-    res.status(200).json(destinations);
+    res.status(200).json(await getDestinations());
   } catch (error) {
     next(error);
   }
 }
 
-export async function getDestination(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function getDestination(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    const id = req.params.id as string;
+    // `Number('abc')` is NaN, which Mongoose would otherwise surface as a
+    // CastError from deep in the driver rather than a clean 400.
+    const id = DestinationIdParam.parse(req.params.id);
+
     const destination = await getDestinationById(id);
-    if (!destination) {
-      res.status(404).json({ error: 'Destination not found' });
-      return;
-    }
+    if (!destination) throw HttpError.notFound('Destination not found');
+
     res.status(200).json(destination);
   } catch (error) {
     next(error);
   }
 }
 
-export async function rateDestination(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function submitReview(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    const id = req.params.id as string;
-    const { rating } = req.body;
-    const userId = req.user?.id;
+    if (!req.user) throw HttpError.unauthorized();
 
-    if (!userId) {
-      res.status(401).json({ error: 'User not authenticated' });
-      return;
+    const id = DestinationIdParam.parse(req.params.id);
+    const { rating, comment } = ReviewSchema.parse(req.body);
+
+    // Only guests who actually booked may review.
+    if (!(await hasStayedAt(req.user.id, id))) {
+      throw HttpError.forbidden('You can only review destinations you have booked');
     }
 
-    if (typeof rating !== 'number' || rating < 1 || rating > 5) {
-      res.status(400).json({ error: 'Invalid rating. Must be a number between 1 and 5.' });
-      return;
-    }
+    // Denormalise the display name so the reviews list needs no populate.
+    const user = await UserModel.findById(req.user.id).select('name').exec();
+    if (!user) throw HttpError.unauthorized();
 
-    // Check if the user has a trip for this destination
-    const existingTrip = await TripModel.findOne({ user: userId, destinationId: Number(id) }).exec();
-    if (!existingTrip) {
-      res.status(403).json({ error: 'You must book this destination before you can rate it.' });
-      return;
-    }
+    const destination = await upsertReview(id, {
+      userId: req.user.id,
+      authorName: user.name,
+      rating,
+      comment,
+    });
+    if (!destination) throw HttpError.notFound('Destination not found');
 
-    const destination = await rateDestinationById(id, userId, rating);
-    if (!destination) {
-      res.status(404).json({ error: 'Destination not found' });
-      return;
-    }
+    res.status(200).json(destination);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function removeReview(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    if (!req.user) throw HttpError.unauthorized();
+
+    const id = DestinationIdParam.parse(req.params.id);
+    const destination = await deleteReview(id, req.user.id);
+    if (!destination) throw HttpError.notFound('Destination not found');
 
     res.status(200).json(destination);
   } catch (error) {

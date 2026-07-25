@@ -1,17 +1,45 @@
 import { Router } from 'express';
-import { getProfile, login, register, refresh, logout, verifyEmail, googleLogin } from '../controllers/auth.controller';
+import {
+  forgotPassword,
+  getProfile,
+  googleLogin,
+  login,
+  logout,
+  refresh,
+  register,
+  resetPassword,
+  verifyEmail,
+} from '../controllers/auth.controller';
 import { verifyToken } from '../middlewares/auth.middleware';
+import {
+  loginLimiter,
+  passwordResetLimiter,
+  registerLimiter,
+  sessionLimiter,
+  verifyEmailLimiter,
+} from '../middlewares/rateLimiter.middleware';
 
 const authRouter = Router();
 
-authRouter.post('/register', register);
-authRouter.post('/login', login);
-authRouter.post('/refresh', refresh);
-authRouter.post('/logout', logout);
-authRouter.get('/me', verifyToken as any, getProfile);
+/**
+ * Each flow carries its own limiter instance, so exhausting one can't lock a
+ * user out of another — a failed sign-up must not block password recovery.
+ */
+authRouter.post('/register', registerLimiter, register);
+authRouter.post('/login', loginLimiter, login);
+authRouter.post('/google', loginLimiter, googleLogin);
+authRouter.post('/verify-email', verifyEmailLimiter, verifyEmail);
 
-// New endpoints for verification and Google Login
-authRouter.post('/verify-email', verifyEmail);
-authRouter.post('/google', googleLogin);
+// Password reset — the login page previously shipped a dead `href="#"` link.
+authRouter.post('/forgot-password', passwordResetLimiter, forgotPassword);
+authRouter.post('/reset-password', passwordResetLimiter, resetPassword);
+
+// Session upkeep fires on every page load, so it gets the generous limiter.
+authRouter.post('/refresh', sessionLimiter, refresh);
+authRouter.post('/logout', sessionLimiter, logout);
+
+// The `verifyToken as any` cast is gone — the middleware is now a real
+// `RequestHandler`.
+authRouter.get('/me', sessionLimiter, verifyToken, getProfile);
 
 export default authRouter;
