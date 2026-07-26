@@ -34,6 +34,13 @@ interface SectionProps extends Omit<ComponentProps<'section'>, 'title'> {
    */
   tone?: 'canvas' | 'surface' | 'muted' | 'inverse';
   spacing?: 'sm' | 'md' | 'lg';
+  /**
+   * Sections clip by default so the decorative shapes that bleed past their
+   * edges don't cause horizontal scroll. Set false on any section containing a
+   * popover, dropdown or other floating element — clipping cut the date picker
+   * off at the section boundary, leaving only its month header visible.
+   */
+  clip?: boolean;
 }
 
 const tones = {
@@ -48,12 +55,22 @@ const spacings = { sm: 'py-14', md: 'py-20 md:py-24', lg: 'py-24 md:py-32' } as 
 export function Section({
   tone = 'canvas',
   spacing = 'md',
+  clip = true,
   className,
   children,
   ...props
 }: SectionProps) {
   return (
-    <section className={cn('relative overflow-hidden', tones[tone], spacings[spacing], className)} {...props}>
+    <section
+      className={cn(
+        'relative',
+        clip ? 'overflow-hidden' : 'overflow-visible',
+        tones[tone],
+        spacings[spacing],
+        className,
+      )}
+      {...props}
+    >
       {children}
     </section>
   );

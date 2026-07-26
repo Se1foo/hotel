@@ -61,7 +61,9 @@ export default function DestinationsPage() {
         </Shell>
       </Section>
 
-      <Section tone="canvas" spacing="sm">
+      {/* `clip={false}` so the date-picker popover isn't cut off at the section
+          edge, and z-30 so it layers above the results section below. */}
+      <Section tone="canvas" spacing="sm" clip={false} className="relative z-30">
         <Shell className="relative z-20">
           {/*
             Keyed on the applied criteria so the search bar's internal draft
