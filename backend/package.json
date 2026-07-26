@@ -1,19 +1,21 @@
 {
-  "name": "backend",
+  "name": "luxe-reserve-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "start": "node dist/index.js",
-    "dev": "tsx watch src/index.ts",
-    "build": "tsc"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "description": "REST API for the Luxe Reserve hotel booking application",
+  "main": "dist/index.js",
   "type": "commonjs",
+  "license": "MIT",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
@@ -27,13 +29,14 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
+    "@types/compression": "^1.8.1",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.6.0",
-    "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.7"
   }
 }

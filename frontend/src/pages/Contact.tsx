@@ -1,165 +1,193 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Phone, MapPin, Send, CheckCircle } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { motion } from 'framer-motion';
+import { CheckCircle, Mail, MapPin, Phone, Send } from 'lucide-react';
+import { getErrorMessage, useSendContactMessage } from '../lib/api';
+import { site } from '../config/site';
+import { Shell } from '../components/ui/Section';
+import { SectionHeading } from '../components/ui/Section';
+import { Input, Textarea } from '../components/ui/Field';
+import { Button } from '../components/ui/Button';
+import { Alert } from '../components/ui/Alert';
+import { useDocumentTitle } from '../lib/useDocumentTitle';
+
+const contactSchema = z.object({
+  name: z.string().trim().min(2, 'Please tell us your name'),
+  email: z.string().min(1, 'Email is required').email('Please enter a valid email address'),
+  message: z
+    .string()
+    .trim()
+    .min(10, 'Please give us a little more detail (at least 10 characters)')
+    .max(2000, 'Please keep your message under 2000 characters'),
+});
+
+type ContactFormValues = z.infer<typeof contactSchema>;
+
+const DETAILS = [
+  { icon: MapPin, label: 'Visit', value: site.contact.address, href: null },
+  { icon: Phone, label: 'Call', value: site.contact.phone, href: `tel:${site.contact.phoneHref}` },
+  { icon: Mail, label: 'Email', value: site.contact.email, href: `mailto:${site.contact.email}` },
+];
 
 export default function ContactPage() {
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  useDocumentTitle('Contact us', 'Questions about a suite, a booking, or a bespoke request? Our reservations team replies within one business day.');
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const sendMessage = useSendContactMessage();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    // Simulate sending
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSubmitted(true);
-      setFormData({ name: '', email: '', message: '' });
-      setTimeout(() => setIsSubmitted(false), 4000);
-    }, 1200);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<ContactFormValues>({ resolver: zodResolver(contactSchema) });
+
+  const onSubmit = async (values: ContactFormValues) => {
+    // The old handler was a `setTimeout(1200)` that flipped a flag and threw the
+    // message away — the form reported success without sending anything.
+    try {
+      await sendMessage.mutateAsync(values);
+      // Reset inside the success path: `sendMessage.isSuccess` is still stale
+      // immediately after the await, since React hasn't re-rendered yet.
+      reset();
+    } catch {
+      // Surfaced via `sendMessage.isError` in the form below.
+    }
   };
 
   return (
-    <div className="pt-24 pb-8 min-h-[calc(100vh-220px)] flex items-center justify-center bg-[#FAF9F6] px-5 md:px-[60px]">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-[1000px] grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center"
-      >
-        {/* Left Side: Info */}
-        <div className="flex flex-col gap-6">
-          <div>
-            <h1 className="text-4xl md:text-5xl font-extrabold text-[#1A1A1A] tracking-tight mb-4">
-              Get in Touch
-            </h1>
-            <p className="text-[#666666] font-medium text-lg max-w-[400px]">
-              Whether you have a question about our exclusive suites, bespoke spa treatments, or anything else, our team is ready to answer all your questions.
-            </p>
-          </div>
+    <Shell className="py-14 md:py-20">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
+        <div>
+          <SectionHeading
+            as="h1"
+            eyebrow="We're here to help"
+            title="Get in"
+            accent="touch"
+            subtitle="Questions about a suite, a spa treatment, or a booking already made? Our reservations team replies within one business day."
+          />
 
-          <div className="space-y-6 mt-4">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-white border border-[#EBEBEB] flex items-center justify-center text-[#8B6B10] shadow-sm">
-                <MapPin className="w-5 h-5" />
-              </div>
-              <div>
-                <h4 className="text-[#1A1A1A] font-bold text-sm uppercase tracking-widest">Location</h4>
-                <p className="text-[#666666] font-medium">123 Luxury Ave, Beverly Hills, CA</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-white border border-[#EBEBEB] flex items-center justify-center text-[#8B6B10] shadow-sm">
-                <Phone className="w-5 h-5" />
-              </div>
-              <div>
-                <h4 className="text-[#1A1A1A] font-bold text-sm uppercase tracking-widest">Phone</h4>
-                <p className="text-[#666666] font-medium">+1 (800) 123-4567</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-white border border-[#EBEBEB] flex items-center justify-center text-[#8B6B10] shadow-sm">
-                <Mail className="w-5 h-5" />
-              </div>
-              <div>
-                <h4 className="text-[#1A1A1A] font-bold text-sm uppercase tracking-widest">Email</h4>
-                <p className="text-[#666666] font-medium">reservations@luxereserve.com</p>
-              </div>
-            </div>
-          </div>
+          <ul className="space-y-5 mt-10">
+            {DETAILS.map(({ icon: Icon, label, value, href }) => (
+              <li key={label} className="flex items-center gap-4">
+                <span
+                  aria-hidden="true"
+                  className="w-12 h-12 shrink-0 rounded-full bg-surface border border-line flex items-center justify-center text-gold shadow-subtle"
+                >
+                  <Icon className="w-5 h-5" />
+                </span>
+                <div className="min-w-0">
+                  <h2 className="text-eyebrow uppercase text-ink">{label}</h2>
+                  {href ? (
+                    <a
+                      href={href}
+                      className="text-ink-muted font-medium hover:text-gold transition-colors break-words"
+                    >
+                      {value}
+                    </a>
+                  ) : (
+                    <p className="text-ink-muted font-medium">{value}</p>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
 
-        {/* Right Side: Form or Success */}
-        <div className="bg-white p-8 rounded-3xl shadow-[0_12px_40px_-6px_rgba(0,0,0,0.04)] border border-[#F0F0F0] h-[480px] flex items-center relative overflow-hidden">
-          <AnimatePresence mode="wait">
-            {!isSubmitted ? (
-              <motion.form 
-                key="contact-form"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                onSubmit={handleSubmit} 
-                className="flex flex-col gap-5 w-full"
-              >
-                <div>
-                  <label className="text-[11px] font-bold text-[#1A1A1A] uppercase tracking-widest block mb-2">Name</label>
-                  <input 
-                    type="text" 
-                    required
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-3 bg-[#FAF9F6] border border-[#EBEBEB] focus:border-[#8B6B10] rounded-2xl outline-none text-[#1A1A1A] font-medium transition-colors"
-                    placeholder="John Doe"
-                    disabled={isSubmitting}
-                  />
-                </div>
-                <div>
-                  <label className="text-[11px] font-bold text-[#1A1A1A] uppercase tracking-widest block mb-2">Email Address</label>
-                  <input 
-                    type="email" 
-                    required
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-3 bg-[#FAF9F6] border border-[#EBEBEB] focus:border-[#8B6B10] rounded-2xl outline-none text-[#1A1A1A] font-medium transition-colors"
-                    placeholder="john@example.com"
-                    disabled={isSubmitting}
-                  />
-                </div>
-                <div>
-                  <label className="text-[11px] font-bold text-[#1A1A1A] uppercase tracking-widest block mb-2">Message</label>
-                  <textarea 
-                    required
-                    rows={3}
-                    value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    className="w-full px-4 py-3 bg-[#FAF9F6] border border-[#EBEBEB] focus:border-[#8B6B10] rounded-2xl outline-none text-[#1A1A1A] font-medium transition-colors resize-none"
-                    placeholder="How can we help you?"
-                    disabled={isSubmitting}
-                  ></textarea>
-                </div>
-                
-                <button 
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-[#1A1A1A] text-white font-bold py-4 rounded-2xl hover:bg-[#8B6B10] transition-colors flex items-center justify-center gap-2 shadow-md mt-2 disabled:opacity-70 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? (
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  ) : (
-                    <>
-                      Send Message
-                      <Send className="w-4 h-4" />
-                    </>
-                  )}
-                </button>
-              </motion.form>
-            ) : (
+        {/* Was a fixed `h-[480px]` box, which clipped content once validation
+            messages appeared. Now it sizes to its contents. */}
+        <div className="bg-surface p-7 md:p-9 rounded-panel shadow-panel border border-line">
+          {/*
+            Enter-only animations, no `AnimatePresence mode="wait"`. This panel
+            sits inside the page-level `AnimatePresence mode="wait"` in `App.tsx`,
+            and nesting the two deadlocked: the form never finished exiting, so
+            the success state never mounted — the message was sent (201) but the
+            user saw no confirmation at all.
+          */}
+          {sendMessage.isSuccess ? (
               <motion.div
-                key="success-message"
-                initial={{ opacity: 0, scale: 0.8 }}
+                key="success"
+                initial={{ opacity: 0, scale: 0.94 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ type: 'spring', bounce: 0.5 }}
-                className="w-full flex flex-col items-center justify-center text-center py-10 absolute inset-0"
+                transition={{ type: 'spring', bounce: 0.35, duration: 0.5 }}
+                className="flex flex-col items-center justify-center text-center py-14"
               >
-                <motion.div
+                <motion.span
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  transition={{ delay: 0.1, type: 'spring', stiffness: 200, damping: 10 }}
-                  className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6 text-green-600"
+                  transition={{ delay: 0.1, type: 'spring', stiffness: 200, damping: 12 }}
+                  className="w-20 h-20 bg-success-soft rounded-full flex items-center justify-center mb-6 text-success"
                 >
-                  <CheckCircle className="w-10 h-10" />
-                </motion.div>
-                <h3 className="text-2xl font-bold text-[#1A1A1A] mb-2">Message Sent!</h3>
-                <p className="text-[#666666] font-medium px-6">
-                  Thank you for reaching out. We will get back to you shortly.
+                  <CheckCircle className="w-10 h-10" aria-hidden="true" />
+                </motion.span>
+
+                <h2 className="text-2xl text-ink mb-2">Message sent</h2>
+                <p role="status" className="text-ink-muted text-pretty mb-8">
+                  Thanks for reaching out — we'll be in touch within one business day.
                 </p>
+
+                <Button variant="outline" onClick={() => sendMessage.reset()}>
+                  Send another message
+                </Button>
               </motion.div>
+            ) : (
+              <motion.form
+                key="form"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2 }}
+                onSubmit={handleSubmit(onSubmit)}
+                noValidate
+                className="flex flex-col gap-5"
+              >
+                {sendMessage.isError && (
+                  <Alert tone="error">
+                    {getErrorMessage(sendMessage.error, 'We could not send your message.')}
+                  </Alert>
+                )}
+
+                <Input
+                  {...register('name')}
+                  label="Name"
+                  autoComplete="name"
+                  placeholder="Jordan Rivera"
+                  error={errors.name?.message}
+                  disabled={sendMessage.isPending}
+                />
+
+                <Input
+                  {...register('email')}
+                  label="Email address"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  error={errors.email?.message}
+                  disabled={sendMessage.isPending}
+                />
+
+                <Textarea
+                  {...register('message')}
+                  label="Message"
+                  rows={5}
+                  placeholder="How can we help?"
+                  error={errors.message?.message}
+                  disabled={sendMessage.isPending}
+                />
+
+                <Button
+                  type="submit"
+                  fullWidth
+                  size="lg"
+                  shape="rounded"
+                  isLoading={sendMessage.isPending}
+                >
+                  Send message
+                  <Send className="w-4 h-4" aria-hidden="true" />
+                </Button>
+              </motion.form>
             )}
-          </AnimatePresence>
         </div>
-      </motion.div>
-    </div>
+      </div>
+    </Shell>
   );
 }

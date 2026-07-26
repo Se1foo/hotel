@@ -1,141 +1,190 @@
-import { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { Suspense, lazy, useEffect } from 'react';
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
+import { isAxiosError } from 'axios';
 
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
-import { Hero } from './components/home/Hero';
-import { RoomsSection } from './components/home/RoomsSection';
-import { TestimonialsSection } from './components/home/TestimonialsSection';
-
-import DealsPage from './pages/Deals';
-import DestinationsPage from './pages/Destinations';
-import DestinationDetailsPage from './pages/DestinationDetails';
-import MyTripsPage from './pages/MyTrips';
-import LoginPage from './pages/Login';
-import SignUpPage from './pages/SignUp';
-import VerifyEmailPage from './pages/VerifyEmail';
-import ContactPage from './pages/Contact';
-
-import { AuthProvider } from './components/auth/AuthContext';
+import { ErrorBoundary } from './components/layout/ErrorBoundary';
+import { AuthProvider } from './components/auth/AuthProvider';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { ToastProvider } from './components/ui/toast/ToastProvider';
+import { LoadingState } from './components/ui/States';
 
+import HomePage from './pages/Home';
+
+// Everything below the first paint is split out. Previously the entire app —
+// including MUI and every page — shipped in a single bundle.
+const DealsPage = lazy(() => import('./pages/Deals'));
+const DestinationsPage = lazy(() => import('./pages/Destinations'));
+const DestinationDetailsPage = lazy(() => import('./pages/DestinationDetails'));
+const MyTripsPage = lazy(() => import('./pages/MyTrips'));
+const SavedPage = lazy(() => import('./pages/Saved'));
+const LoginPage = lazy(() => import('./pages/Login'));
+const SignUpPage = lazy(() => import('./pages/SignUp'));
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPassword'));
+const ResetPasswordPage = lazy(() => import('./pages/ResetPassword'));
+const VerifyEmailPage = lazy(() => import('./pages/VerifyEmail'));
+const ContactPage = lazy(() => import('./pages/Contact'));
+const LegalPage = lazy(() => import('./pages/Legal'));
+const NotFoundPage = lazy(() => import('./pages/NotFound'));
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60_000,
+      gcTime: 5 * 60_000,
+      refetchOnWindowFocus: false,
+      retry: (failureCount, error) => {
+        // Retrying a 4xx just burns rate limit — the request was wrong, not unlucky.
+        if (isAxiosError(error)) {
+          const status = error.response?.status ?? 0;
+          if (status >= 400 && status < 500) return false;
+        }
+        return failureCount < 2;
+      },
+    },
+    mutations: {
+      // Mutations are not idempotent in general; a failed booking must not be
+      // silently retried into a duplicate.
+      retry: false,
+    },
+  },
+});
+
+/**
+ * Restores scroll on navigation. Deliberately instant rather than smooth — a
+ * smooth scroll here fights the page transition.
+ */
 function ScrollToTop() {
   const { pathname } = useLocation();
   useEffect(() => {
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: 'instant' });
   }, [pathname]);
   return null;
 }
 
-import { HowItWorksSection } from './components/home/HowItWorksSection';
+/**
+ * Route transition.
+ *
+ * This deliberately does **not** use `AnimatePresence`. The previous version
+ * wrapped `<Suspense>` in `<AnimatePresence mode="wait">`, but AnimatePresence
+ * can only drive an exit animation on a direct child that participates in
+ * presence — `Suspense` does not. So `mode="wait"` waited forever for an exit
+ * that never completed: clicking any in-app link changed the URL and left the
+ * previous page on screen. Testing via full page loads masked it entirely.
+ *
+ * A keyed enter-only animation gives the same perceived polish, cannot deadlock,
+ * and honours `prefers-reduced-motion` by starting at the final state.
+ */
+function PageTransition({ children }: { children: React.ReactNode }) {
+  const reduceMotion = useReducedMotion();
 
-function HomePage() {
-  return (
-    <>
-      <Hero />
-      <HowItWorksSection />
-      <RoomsSection />
-      <TestimonialsSection />
-    </>
-  );
-}
-
-function PageWrapper({ children }: { children: React.ReactNode }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 15, filter: 'blur(4px)' }}
-      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-      exit={{ opacity: 0, y: -15, filter: 'blur(4px)' }}
-      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      className="w-full h-full"
+      initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: reduceMotion ? 0 : 0.28, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.div>
   );
 }
 
-function AnimatedRoutes() {
+function AppRoutes() {
   const location = useLocation();
+
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<PageWrapper><HomePage /></PageWrapper>} />
-        <Route path="/deals" element={<PageWrapper><DealsPage /></PageWrapper>} />
-        <Route path="/destinations" element={<PageWrapper><DestinationsPage /></PageWrapper>} />
-        <Route path="/destination/:id" element={<PageWrapper><DestinationDetailsPage /></PageWrapper>} />
-        <Route path="/contact" element={<PageWrapper><ContactPage /></PageWrapper>} />
-        <Route
-          path="/trips"
-          element={
-            <PageWrapper>
-              <ProtectedRoute>
-                <MyTripsPage />
-              </ProtectedRoute>
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/login"
-          element={
-            <PageWrapper>
-              <ProtectedRoute redirectIfAuth>
-                <LoginPage />
-              </ProtectedRoute>
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/signup"
-          element={
-            <PageWrapper>
-              <ProtectedRoute redirectIfAuth>
-                <SignUpPage />
-              </ProtectedRoute>
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/verify-email"
-          element={
-            <PageWrapper>
-              <VerifyEmailPage />
-            </PageWrapper>
-          }
-        />
-      </Routes>
-    </AnimatePresence>
+      <Suspense fallback={<LoadingState message="Loading…" />}>
+        <PageTransition key={location.pathname}>
+          <Routes location={location}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/deals" element={<DealsPage />} />
+            <Route path="/destinations" element={<DestinationsPage />} />
+            <Route path="/destination/:id" element={<DestinationDetailsPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/privacy" element={<LegalPage kind="privacy" />} />
+            <Route path="/terms" element={<LegalPage kind="terms" />} />
+            <Route path="/verify-email" element={<VerifyEmailPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+            <Route
+              path="/trips"
+              element={
+                <ProtectedRoute>
+                  <MyTripsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/saved"
+              element={
+                <ProtectedRoute>
+                  <SavedPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                <ProtectedRoute redirectIfAuth>
+                  <LoginPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/signup"
+              element={
+                <ProtectedRoute redirectIfAuth>
+                  <SignUpPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/forgot-password"
+              element={
+                <ProtectedRoute redirectIfAuth>
+                  <ForgotPasswordPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Catch-all — unknown paths used to render an empty page. */}
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </PageTransition>
+      </Suspense>
   );
 }
 
-const queryClient = new QueryClient();
-
-function App() {
+export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <Router>
-          <ScrollToTop />
-          <div className="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col overflow-x-hidden relative">
-            <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden opacity-[0.025] flex justify-between max-w-[1280px] mx-auto px-5 md:px-[60px]">
-              <div className="w-[1px] h-full bg-on-surface"></div>
-              <div className="w-[1px] h-full bg-on-surface hidden md:block"></div>
-              <div className="w-[1px] h-full bg-on-surface hidden md:block"></div>
-              <div className="w-[1px] h-full bg-on-surface hidden md:block"></div>
-              <div className="w-[1px] h-full bg-on-surface"></div>
-            </div>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <AuthProvider>
+            <ToastProvider>
+              <ScrollToTop />
 
-            <Navbar />
-            <main className="flex-grow relative z-10 w-full">
-              <AnimatedRoutes />
-            </main>
-            <Footer />
-          </div>
-        </Router>
-      </AuthProvider>
-    </QueryClientProvider>
+              <a
+                href="#main"
+                className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-5 focus:py-3 focus:bg-ink focus:text-ink-inverse focus:rounded-full focus:font-bold focus:text-sm"
+              >
+                Skip to content
+              </a>
+
+              <div className="min-h-screen flex flex-col">
+                <Navbar />
+                <main id="main" className="flex-grow w-full">
+                  <AppRoutes />
+                </main>
+                <Footer />
+              </div>
+            </ToastProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
-
-export default App;

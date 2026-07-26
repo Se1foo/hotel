@@ -1,56 +1,96 @@
+import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useAuth } from '../auth/AuthContext';
-import { LogOut } from 'lucide-react';
+import { LogOut, Menu, User, X } from 'lucide-react';
+import { useAuth } from '../auth/useAuth';
+import { navLinks } from '../../config/site';
+import { Shell } from '../ui/Section';
+import { Button } from '../ui/Button';
+import { Logo } from './Logo';
+import { cn } from '../../lib/utils';
 
-const NAV_LINKS = [
-  { name: 'Home', path: '/' },
-  { name: 'Destinations', path: '/destinations' },
-  { name: 'Deals', path: '/deals' },
-  { name: 'My Trips', path: '/trips' },
-  { name: 'Contact us', path: '/contact' },
-];
+/**
+ * `/destination/:id` should light up the "Destinations" tab. The old check was
+ * a strict `pathname === path`, so detail pages highlighted nothing.
+ */
+function isRouteActive(pathname: string, path: string): boolean {
+  if (path === '/') return pathname === '/';
+  if (path === '/destinations') return pathname.startsWith('/destination');
+  return pathname === path || pathname.startsWith(`${path}/`);
+}
 
-export const Navbar = () => {
-  const location = useLocation();
-  const { isAuthenticated, logout } = useAuth();
+export function Navbar() {
+  const { pathname } = useLocation();
+  const { isAuthenticated, user, logout } = useAuth();
+
+  // Signed-out visitors don't see links that would only bounce them to /login.
+  const links = navLinks.filter((link) => !link.requiresAuth || isAuthenticated);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+
+  // Read synchronously on first render so a page loaded mid-scroll (a refresh,
+  // or a back-navigation with restored scroll) paints the correct header state
+  // instead of flashing the un-scrolled one.
+  const [scrolled, setScrolled] = useState(() =>
+    typeof window === 'undefined' ? false : window.scrollY > 8,
+  );
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Lock body scroll and close on Escape while the drawer is open.
+  useEffect(() => {
+    if (!menuOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closeMenu();
+    };
+    document.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [menuOpen, closeMenu]);
 
   return (
-    <header className="absolute top-0 w-full z-50 bg-surface">
-      <div className="max-w-[1280px] mx-auto px-5 md:px-[60px] flex justify-between items-center h-24">
-        <div className="flex items-center">
-          <Link to="/">
-            <div className="flex items-center gap-2">
-              <svg width="28" height="32" viewBox="0 0 28 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-primary">
-                <path d="M6 4C13 12 13 20 6 28" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M16 4C23 12 23 20 16 28" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <div className="flex flex-col ml-1">
-                <span className="font-h1 font-bold text-2xl leading-none tracking-tighter text-on-surface">HOTEL.</span>
-                <span className="font-body-md text-[8px] tracking-[0.2em] text-on-surface-variant uppercase mt-1">For your vacation</span>
-              </div>
-            </div>
-          </Link>
-        </div>
+    <header
+      className={cn(
+        // Was `absolute`, which forced every page to compensate with a magic
+        // pt-24/pt-32/pt-40 and meant the nav scrolled away entirely.
+        'sticky top-0 z-50 transition-all duration-300',
+        scrolled
+          ? 'bg-canvas/85 backdrop-blur-md border-b border-line shadow-subtle'
+          : 'bg-canvas border-b border-transparent',
+      )}
+    >
+      <Shell className="flex items-center justify-between h-20 md:h-24 gap-4">
+        <Logo />
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
-          {NAV_LINKS.map((link) => {
-            const isActive = location.pathname === link.path || (link.path === '/' && location.pathname === '');
+        <nav aria-label="Main navigation" className="hidden lg:flex items-center gap-8">
+          {links.map((link) => {
+            const active = isRouteActive(pathname, link.path);
             return (
               <Link
-                key={link.name}
+                key={link.path}
                 to={link.path}
-                className={`font-nav-link text-nav-link relative py-2 transition-colors ${
-                  isActive ? 'text-on-surface' : 'text-on-surface-variant hover:text-on-surface'
-                }`}
+                aria-current={active ? 'page' : undefined}
+                className={cn(
+                  'relative py-2 text-[15px] font-semibold transition-colors',
+                  active ? 'text-ink' : 'text-ink-muted hover:text-ink',
+                )}
               >
                 {link.name}
-                {isActive && (
-                  <motion.span 
+                {active && (
+                  <motion.span
                     layoutId="navbar-indicator"
-                    className="absolute bottom-0 left-0 w-full h-[2px] bg-primary rounded-full"
-                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                    className="absolute -bottom-0.5 left-0 w-full h-[2px] bg-amber rounded-full"
+                    transition={{ type: 'spring', stiffness: 350, damping: 30 }}
                   />
                 )}
               </Link>
@@ -58,45 +98,132 @@ export const Navbar = () => {
           })}
         </nav>
 
-        {/* Auth Buttons / Profile Details */}
-        <div className="hidden md:flex items-center gap-4">
-          {!isAuthenticated ? (
+        <div className="hidden lg:flex items-center gap-3">
+          {isAuthenticated ? (
             <>
-              <Link
-                to="/login"
-                className="font-bold text-[14px] text-[#4A4A4A] hover:text-[#1A1A1A] transition-colors px-2 py-2"
-              >
-                Login
-              </Link>
-              <Link
-                to="/signup"
-                className="bg-[#1A1A1A] text-white font-bold text-[14px] px-6 py-2.5 rounded-full hover:bg-[#8B6B10] transition-colors shadow-sm"
-              >
-                Sign Up
-              </Link>
+              <span className="flex items-center gap-2 text-sm font-semibold text-ink-muted max-w-[180px]">
+                <User className="w-4 h-4 shrink-0" aria-hidden="true" />
+                <span className="truncate">{user?.name}</span>
+              </span>
+              <Button variant="outline" size="sm" onClick={logout}>
+                <LogOut className="w-4 h-4" aria-hidden="true" />
+                Log out
+              </Button>
             </>
           ) : (
-            <button
-              onClick={logout}
-              className="bg-white border border-[#F0F0F0] text-[#1A1A1A] font-bold text-[14px] px-6 py-2.5 rounded-full hover:bg-[#F9F9F9] hover:text-red-600 hover:border-red-200 transition-all shadow-sm flex items-center gap-2"
-            >
-              <LogOut className="w-4 h-4" />
-              Log Out
-            </button>
+            <>
+              <Button variant="ghost" size="sm" to="/login">
+                Log in
+              </Button>
+              <Button size="sm" to="/signup">
+                Sign up
+              </Button>
+            </>
           )}
         </div>
-        
-        {/* Mobile menu toggle placeholder */}
-        <div className="md:hidden">
-          <button className="text-on-surface p-2">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-          </button>
-        </div>
-      </div>
+
+        {/* The old hamburger was a labelled "placeholder" with no handler, so
+            mobile users had no navigation and no way to log in at all. */}
+        <button
+          type="button"
+          onClick={() => setMenuOpen((open) => !open)}
+          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={menuOpen}
+          aria-controls="mobile-menu"
+          className="lg:hidden p-2 -mr-2 text-ink rounded-lg hover:bg-surface-muted transition-colors"
+        >
+          {menuOpen ? (
+            <X className="w-6 h-6" aria-hidden="true" />
+          ) : (
+            <Menu className="w-6 h-6" aria-hidden="true" />
+          )}
+        </button>
+      </Shell>
+
+      {/*
+        Rendered conditionally with an enter-only animation rather than through
+        `AnimatePresence`. Animating `height: auto -> 0` on exit reliably stalled
+        just short of zero, leaving the drawer in the DOM at 0.8px with
+        `opacity: 0` — visually gone, but its seven links and the log-out button
+        stayed in the keyboard tab order. Unmounting outright is both simpler and
+        the only version that is actually accessible when closed.
+      */}
+      {menuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              onClick={closeMenu}
+              className="lg:hidden fixed inset-0 top-20 bg-ink/20 backdrop-blur-sm z-40"
+              aria-hidden="true"
+            />
+
+            <motion.nav
+              id="mobile-menu"
+              aria-label="Mobile navigation"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              className="lg:hidden relative z-50 overflow-hidden bg-canvas border-b border-line shadow-panel"
+            >
+              <Shell className="py-5 flex flex-col gap-1">
+                {links.map((link) => {
+                  const active = isRouteActive(pathname, link.path);
+                  return (
+                    <Link
+                      key={link.path}
+                      to={link.path}
+                      aria-current={active ? 'page' : undefined}
+                      // Closed on click rather than in an effect keyed on
+                      // `pathname` — a `setState` in an effect body triggers a
+                      // cascading render, and this is the actual user intent.
+                      onClick={closeMenu}
+                      className={cn(
+                        'py-3 px-4 rounded-xl text-base font-semibold transition-colors',
+                        active
+                          ? 'bg-gold-soft text-gold-dark'
+                          : 'text-ink-muted hover:bg-surface-muted hover:text-ink',
+                      )}
+                    >
+                      {link.name}
+                    </Link>
+                  );
+                })}
+
+                <div className="mt-4 pt-5 border-t border-line flex flex-col gap-3">
+                  {isAuthenticated ? (
+                    <>
+                      <span className="flex items-center gap-2 px-4 text-sm font-semibold text-ink-muted">
+                        <User className="w-4 h-4 shrink-0" aria-hidden="true" />
+                        <span className="truncate">{user?.name}</span>
+                      </span>
+                      <Button
+                        variant="outline"
+                        fullWidth
+                        onClick={() => {
+                          closeMenu();
+                          void logout();
+                        }}
+                      >
+                        <LogOut className="w-4 h-4" aria-hidden="true" />
+                        Log out
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button variant="outline" fullWidth to="/login">
+                        Log in
+                      </Button>
+                      <Button fullWidth to="/signup">
+                        Sign up
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </Shell>
+            </motion.nav>
+          </>
+        )}
     </header>
   );
-};
+}

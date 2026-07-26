@@ -1,112 +1,96 @@
-import { Star } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useMousePosition } from '../../lib/useMousePosition';
+import { Quote } from 'lucide-react';
+import { site } from '../../config/site';
+import { Section, SectionHeading, Shell } from '../ui/Section';
+import { CrossMarks, DotGrid } from '../ui/Decor';
+import { StarRating } from '../ui/StarRating';
+import { SmartImage } from '../ui/SmartImage';
 
 const TESTIMONIALS = [
   {
-    id: 1,
+    id: 'helen-worden',
     name: 'Helen Worden',
-    text: 'StayEase made our anniversary trip absolutely perfect. The hotel recommendations were spot on and the booking process was completely seamless.',
-    image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400',
+    role: 'Anniversary trip to Santorini',
+    quote: `${site.name} made our anniversary trip absolutely perfect. The recommendations were spot on and the booking process was completely seamless.`,
+    image:
+      'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400',
     rating: 5,
   },
   {
-    id: 2,
+    id: 'luke-coursey',
     name: 'Luke Coursey',
-    text: 'I travel constantly for work and this platform has been a game changer. Exclusive deals and a gorgeous interface that actually works.',
-    image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400',
+    role: 'Books 30+ nights a year',
+    quote:
+      'I travel constantly for work and this has been a genuine upgrade. Exclusive rates, and an interface that actually gets out of my way.',
+    image:
+      'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400',
+    rating: 5,
+  },
+  {
+    id: 'amara-okafor',
+    name: 'Amara Okafor',
+    role: 'Family stay in the Swiss Alps',
+    quote:
+      'Booking for four with two kids is usually a nightmare. Here it took five minutes and the suite was exactly as pictured.',
+    image:
+      'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=400',
     rating: 5,
   },
 ];
 
-export const TestimonialsSection = () => {
-  const mouse = useMousePosition();
-
+export function TestimonialsSection() {
   return (
-    <section className="py-[80px] bg-surface relative overflow-hidden">
-      {/* Background Shapes */}
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-0">
-        {/* Large U-Shape / Half circle with mouse parallax */}
-        <div 
-          className="absolute top-4 right-[15%] w-[120px] h-[60px] opacity-40 transition-transform duration-500 ease-out"
-          style={{
-            transform: `translate3d(${mouse.x * -12}px, ${mouse.y * -12}px, 0) rotate(${mouse.x * -3}deg)`,
-          }}
-        >
-          <svg className="text-outline-variant w-full h-full" viewBox="0 0 120 60" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M0,0 A60,60 0 0,0 120,0" />
-          </svg>
-        </div>
-        
-        {/* Yellow dots grid middle left */}
-        <div 
-          className="absolute top-[45%] left-[5%] grid grid-cols-3 gap-3 opacity-30 transition-transform duration-500 ease-out"
-          style={{
-            transform: `translate3d(${mouse.x * 8}px, ${mouse.y * 8}px, 0)`,
-          }}
-        >
-          {[...Array(9)].map((_, i) => (
-            <div key={`dot-${i}`} className="w-2 h-2 rounded-full bg-primary"></div>
-          ))}
-        </div>
-
-        {/* Double X marks at bottom right */}
-        <div 
-          className="absolute bottom-[20%] right-[10%] flex gap-4 text-on-surface-variant/40 font-medium text-2xl select-none transition-transform duration-500 ease-out"
-          style={{
-            transform: `translate3d(${mouse.x * 5}px, ${mouse.y * 5}px, 0)`,
-          }}
-        >
-          <span>x</span>
-          <span>x</span>
-        </div>
-        
-        {/* End Background Shapes */}
+    <Section tone="canvas" spacing="lg">
+      <div className="absolute inset-0 pointer-events-none z-0 hidden md:block" aria-hidden="true">
+        <DotGrid className="top-[45%] left-[3%] opacity-30" columns={3} count={9} tone="amber" depth={8} />
+        <CrossMarks className="bottom-[20%] right-[8%]" depth={5} />
       </div>
 
-      <div className="max-w-[1280px] mx-auto px-5 md:px-[60px] relative z-10">
-        <h2 className="font-h2 text-headline-md text-on-surface mb-12">What our customers say:</h2>
+      <Shell className="relative z-10">
+        <SectionHeading
+          eyebrow="Guest stories"
+          title="What our guests"
+          accent="say"
+          subtitle="Thousands of stays booked, and these are the reviews we're proudest of."
+        />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {TESTIMONIALS.map((t, index) => (
-            <motion.div 
-              key={t.id} 
-              className="relative flex items-center gap-6 group cursor-pointer"
-              whileHover={{ x: 4 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        {/* Was a 2-column grid holding 2 cards whose copy was clamped to 280px,
+            leaving lopsided whitespace. Three even cards fill the row. */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-14">
+          {TESTIMONIALS.map((testimonial, index) => (
+            <motion.figure
+              key={testimonial.id}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.5, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+              className="bg-surface border border-line rounded-panel p-7 shadow-card flex flex-col h-full"
             >
-              {/* Decorative dot for the first testimonial */}
-              {index === 0 && (
-                <motion.div 
-                  className="absolute -left-6 top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-primary hidden lg:block"
-                  animate={{ scale: [1, 1.25, 1] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              <Quote className="w-8 h-8 text-amber mb-5 shrink-0" aria-hidden="true" />
+
+              <blockquote className="text-ink leading-relaxed text-pretty flex-grow">
+                {testimonial.quote}
+              </blockquote>
+
+              <figcaption className="flex items-center gap-4 mt-7 pt-6 border-t border-line">
+                <SmartImage
+                  src={testimonial.image}
+                  alt={`Portrait of ${testimonial.name}`}
+                  width={112}
+                  height={112}
+                  wrapperClassName="w-14 h-14 rounded-full shrink-0"
+                  className="grayscale hover:grayscale-0 transition-all duration-500"
                 />
-              )}
-              
-              <div className="shrink-0 w-[160px] h-[160px] overflow-hidden">
-                <img 
-                  src={t.image} 
-                  alt={t.name} 
-                  className="w-full h-full object-cover grayscale opacity-90 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-102 transition-all duration-500"
-                />
-              </div>
-              
-              <div className="flex flex-col">
-                <div className="flex text-primary mb-3">
-                  {[...Array(t.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-current" />
-                  ))}
+                <div className="min-w-0">
+                  <p className="font-bold text-ink truncate">{testimonial.name}</p>
+                  <p className="text-sm text-ink-muted truncate">{testimonial.role}</p>
+                  <StarRating value={testimonial.rating} size="sm" className="mt-1.5" />
                 </div>
-                <h3 className="font-h3 text-headline-sm text-on-surface mb-2">{t.name}</h3>
-                <p className="font-body-md text-on-surface-variant max-w-[280px]">
-                  {t.text}
-                </p>
-              </div>
-            </motion.div>
+              </figcaption>
+            </motion.figure>
           ))}
         </div>
-      </div>
-    </section>
+      </Shell>
+    </Section>
   );
-};
+}
