@@ -66,6 +66,15 @@ export function PillOutline({ className, depth = 0 }: DecorProps) {
   );
 }
 
+/**
+ * Two small crosses.
+ *
+ * These used to be literal `<span>x</span>` text. Set in the body font at 2xl
+ * they rendered as a lowercase letter, so next to real copy they read as a
+ * stray typo rather than as ornament — it showed up in every screenshot of the
+ * landing page. Drawn as strokes instead, sized in `em` so the existing
+ * `text-xl` / `text-2xl` call sites still control them.
+ */
 export function CrossMarks({ className, depth = 0 }: DecorProps) {
   const style = useParallax(depth);
   return (
@@ -73,13 +82,29 @@ export function CrossMarks({ className, depth = 0 }: DecorProps) {
       aria-hidden="true"
       style={style}
       className={cn(
-        'absolute flex gap-4 text-ink-faint font-medium text-2xl select-none transition-transform duration-500 ease-out',
+        'absolute flex gap-4 text-ink-faint text-2xl select-none transition-transform duration-500 ease-out',
         className,
       )}
     >
-      <span>x</span>
-      <span>x</span>
+      <Cross />
+      <Cross />
     </div>
+  );
+}
+
+function Cross() {
+  return (
+    <svg
+      viewBox="0 0 10 10"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.4}
+      strokeLinecap="round"
+      aria-hidden="true"
+      className="h-[0.62em] w-[0.62em]"
+    >
+      <path d="M1.5 1.5 8.5 8.5M8.5 1.5 1.5 8.5" />
+    </svg>
   );
 }
 
